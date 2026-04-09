@@ -1,0 +1,29 @@
+.navBar{
+    display: flex;
+    justify-content: center;     /* center horizontally */
+    align-items: center; 
+    position: sticky;
+    top: 0;
+
+    height:50px;
+    width: 100%;
+    flex-direction: row;
+    background-color: rgb(128, 0, 100);
+}
+
+.navBar .navElement{
+    display: flex;
+    justify-content: center;     /* center horizontally */
+    align-items: center; 
+    height: 100%;
+    background-color: rgb(90    , 0, 80);
+
+    border: 2px solid black;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.navBar .navElement h3{
+    color: white;
+    
+}

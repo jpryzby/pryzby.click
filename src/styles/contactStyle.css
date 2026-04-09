@@ -1,0 +1,11 @@
+.contactContainer .messagebox{
+    width: 100%;
+}
+
+.contactContainer h6,h2 {
+    color: #ddd;
+}
+
+.contactContainer textarea::placeholder{
+    color: black;
+}

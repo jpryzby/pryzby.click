@@ -1,0 +1,36 @@
+
+.aboutContainer{
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    background-color: #333399;
+}
+
+.aboutContainer .aboutParagraph{
+    width: 50%;
+    padding: 5% 5% 5% 10%;
+}
+
+.aboutContainer .aboutProfile{
+    display: flex;
+    justify-content: center;     /* center horizontally */
+    align-items: center; 
+
+    width: 50%;
+    padding: 5% 10% 5% 5%;
+}
+
+.aboutContainer .aboutProfile img{
+    height: 100%;
+    width: 100%;
+}
+
+.aboutContainer .aboutParagraph p{
+    text-indent: 2em;
+    color: #ddd;
+}
+
+.contactContainer{
+    background-color: forestgreen;
+    padding: 20px;
+}
