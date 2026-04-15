@@ -11,9 +11,9 @@ let delta;
 let lastTime = performance.now();
 
 //Variables for animation 
-let connectionLength = (Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20;
+let connectionLength = Math.max(75,(Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20);
 let mouseInfluenceRange = window.innerHeight < window.innerWidth ? window.innerHeight * 0.6 : window.innerHeight * 0.6;
-let numberOfparticles = (window.innerHeight * window.innerWidth) / 2500;
+let numberOfparticles = Math.max(100,(window.innerHeight * window.innerWidth) / 2500);
 const particleVelocity = 0.2; 
 
 console.log("mouseInfluenceRange: " + mouseInfluenceRange);
@@ -41,7 +41,7 @@ export default function Landing(){
         const mouse = { x: -100, y: -100 };
         
         function resizeCanvas(canvas) {
-            connectionLength = (Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20;
+            connectionLength = Math.max(75,(Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20);
             mouseInfluenceRange = window.innerHeight < window.innerWidth ? window.innerHeight * 0.6 : window.innerHeight * 0.6;
             
             canvas.width = window.innerWidth;
