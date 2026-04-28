@@ -1,8 +1,23 @@
+
+
+.contactContainer {
+    background-color: #262626;
+    padding: 24px;
+    border: 3px solid rgba(165, 25, 145);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    /* position: relative; */
+}
+
 .contactContainer .messagebox{
     width: 100%;
 }
 
-.contactContainer h6,h2 {
+.contactContainer h1 {
+    color: #5f92bd;
+}
+
+.contactContainer h6 {
     color: #ddd;
 }
 

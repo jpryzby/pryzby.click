@@ -32,3 +32,59 @@ canvas{
     width: 100%;
 }
 
+.center-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 999;
+}
+
+.top-text {
+  font: bold 64px Arial;
+  white-space: nowrap;
+}
+
+.bottomtext {
+  margin-top: 20px;
+  font: bold 32px Arial;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.bottomtext:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(38, 38, 38, 0.4);
+  /* background-color: rgba(38, 38, 38, 0.65); */
+  cursor: pointer;
+}
+
+.bottomtext:active {
+  transform: scale(0.98);
+}
+
+#text1 {
+  color: white;
+  opacity: 0;
+  z-index: 999;
+}
+
+#text2 {
+  color: rgb(0,150,170);
+  opacity: 0;
+  z-index: 999;
+}
+
+#text3 {
+  color: white;
+  opacity: 0;
+  z-index: 999;
+  border: 2px solid rgba(255, 255, 255, 255); /* invisible border */
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: rgba(38, 38, 38, 0.65);
+}

@@ -1,8 +1,4 @@
-
-.aboutContainer{
-    height: auto;
-    display: flex;
-    flex-direction: column;
+.projectsContainer {
     background-color: #262626;
     padding: 24px;
     border: 3px solid rgba(165, 25, 145);
@@ -10,7 +6,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-.aboutContainer .aboutTitle {
+.projectsContainer .projectsTitle{
     height: auto;
     display: flex;
     flex-direction: row;
@@ -18,11 +14,11 @@
     padding: 24px;
 }
 
-.aboutContainer .aboutTitle h1 {
-    color: #5f92bd;
+.projectsContainer .projectsTitle h1{
+    color: #5f92bd;  
 }
 
-.aboutContainer .aboutBody {
+.projectsContainer .projectContainer{
     height: auto;
     display: flex;
     flex-direction: row;
@@ -30,7 +26,7 @@
     /* padding: 24px; */
 }
 
-.aboutContainer .aboutBody .aboutParagraph{
+.projectsContainer .projectContainer .projectDescription{
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -39,12 +35,12 @@
     align-items: center; 
 }
 
-.aboutContainer .aboutBody .aboutParagraph p{
+.projectsContainer .projectContainer .projectDescription p{
     text-indent: 2em;
     color: #ddd;
 }
 
-.aboutContainer .aboutBody .aboutProfile{
+.projectsContainer .projectContainer .projectImg{
     display: flex;
     flex: 1;
     padding: 24px;
@@ -52,8 +48,7 @@
     align-items: center; 
 }
 
-.aboutContainer .aboutBody .aboutProfile img{
+.projectsContainer .projectContainer .projectImg img{
     height: 100%;
     width: 100%;
 }
-

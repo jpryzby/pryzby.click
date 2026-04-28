@@ -10,6 +10,8 @@ let fps;
 let delta;
 let lastTime = performance.now();
 
+
+
 //Variables for animation 
 let connectionLength = Math.max(75,(Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20);
 let mouseInfluenceRange = window.innerHeight < window.innerWidth ? window.innerHeight * 0.6 : window.innerHeight * 0.6;
@@ -33,6 +35,7 @@ export default function Landing(){
 
         const canvas = canvasRef.current
         const context = canvas.getContext("2d");
+        
 
         let gridRows = Math.ceil(window.innerWidth / connectionLength);
         let gridCols = Math.ceil(window.innerHeight / connectionLength);
@@ -41,7 +44,7 @@ export default function Landing(){
         const mouse = { x: -100, y: -100 };
         
         function resizeCanvas(canvas) {
-            connectionLength = Math.max(75,(Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20);
+            connectionLength = Math.max(100,(Math.sqrt(window.innerHeight**2 + window.innerWidth**2)) / 20);
             mouseInfluenceRange = window.innerHeight < window.innerWidth ? window.innerHeight * 0.6 : window.innerHeight * 0.6;
             
             canvas.width = window.innerWidth;
@@ -63,12 +66,30 @@ export default function Landing(){
         document.addEventListener("mousemove", handleMouseMove);
 
 
-
+        const startTime = performance.now();
         function animate(time){
             requestAnimationFrame(animate);
             
             //clear previous frame
             context.clearRect(0,0,innerWidth, innerHeight); 
+            const textTime = time - startTime;
+
+
+            
+            // text1: fade in over 2 seconds
+            const opacity1 = Math.min(1, textTime / 2000);
+            text1.style.opacity = opacity1;
+
+            // text2: delay 1 second, then fade in over 2 seconds
+            const delay2 = 1000;
+            const opacity2 = Math.min(1, Math.max(0, (textTime - delay2) / 1000));
+            text2.style.opacity = opacity2;
+
+            // text3: delay 1 second, then fade in over 2 seconds
+            const delay3 = 3000;
+            const opacity3 = Math.min(1, Math.max(0, (textTime - delay3) / 1000));
+            text3.style.opacity = opacity3;
+            
          
             particleGrid = clearParticleGrid(particleGrid,gridRows,gridCols); //clear particle grid
             
@@ -78,7 +99,7 @@ export default function Landing(){
 
             drawConnectionLines(mouse,particleGrid,context);
 
-            
+            // drawText(context, time);
             lastTime = renderFrameCount(context,time,lastTime); //render fps. update last frame time
             
         }
@@ -88,9 +109,21 @@ export default function Landing(){
     return(
         <div className="landingContainer">
             <canvas ref={canvasRef}>Test</canvas>
-            {/* <div className="textAnimationContainer">
-                <h2>Welcome</h2>
-            </div> */}
+            <div className="center-wrapper">
+                <div className="top-text">
+                    <span id="text1">Hi, I'm </span>
+                    <span id="text2">Jon</span>
+                </div>
+                <div className="bottomtext"
+                    onClick={() => {
+                        document.getElementById('projectsContainer').scrollIntoView({
+                        behavior: 'smooth'
+                        });
+                    }}
+                >
+                    <span id="text3">↓ See my work ↓</span>
+                </div>
+            </div>
         </div>  
     )
 }
@@ -343,3 +376,46 @@ function drawConnectionLines(mouse,particleGrid,context){
         }
     }
 }
+
+
+
+// function drawText(context, time) {
+//     context.save();
+
+//     const text1 = "Hi, I'm ";
+//     const text2 = "Jon";
+
+//     const x = innerWidth / 2;
+//     const y = innerHeight / 2;
+
+//     context.font = "bold 64px Arial";
+//     context.textAlign = "left";
+//     context.textBaseline = "middle";
+
+//     // measure widths
+//     const width1 = context.measureText(text1).width;
+//     const width2 = context.measureText(text2).width;
+//     const totalWidth = width1 + width2;
+
+//     let startX = x - totalWidth / 2;
+
+//     // ---- Fade logic ----
+//     // text1: fade in over 2 seconds
+//     const opacity1 = Math.min(1, time / 2000);
+
+//     // text2: wait 5 seconds, then fade in over 2 seconds
+//     const delay = 1000;
+//     const opacity2 = Math.min(1, Math.max(0, (time - delay) / 2000));
+
+//     // ---- Draw text1 ----
+//     context.globalAlpha = opacity1;
+//     context.fillStyle = "rgb(255,255,255)";
+//     context.fillText(text1, startX, y);
+
+//     // ---- Draw text2 ----
+//     context.globalAlpha = opacity2;
+//     context.fillStyle = "rgb(0,150,170)";
+//     context.fillText(text2, startX + width1, y);
+
+//     context.restore();
+// }

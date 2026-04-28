@@ -2,8 +2,8 @@ import '../styles/contactStyle.css';
 
 export default function Contact(){
     return(
-        <div className='contactContainer'>
-            <h2>contact</h2>
+        <div className='contactContainer' id='contactContainer'>
+            <h1>contact</h1>
 
             <h6>email</h6>
             <textarea name="email" id="" defaultValue={'Your Email'}></textarea>
