@@ -51,7 +51,11 @@ export default function Projects(){
                         </p>
                         <br />
                         <p>
-                            This tool can hide ________ characters in a 2000x2000 image. Thats the entire Harry Potter book series. Twice!
+                            The user can choose the "bit depth", which determines how much data is stored in each pixel (and also how distorted the image looks). A lower bit depth produces an image that is more faithful to the original. A higher bit depth can store more data.
+                        </p>
+                        <br />
+                        <p>
+                            This tool can hide ________ characters in a 2000x2000 image with a bit depth of ______, without noticably altering the image. Thats the entire Harry Potter book series. Twice!
                         </p>
                     </div>
                 </div>
