@@ -60,8 +60,8 @@ export default function Landing(){
 
         ///TODO
         const handleMouseMove = (event) => {
-            mouse.x = event.clientX;
-            mouse.y = event.clientY;
+            mouse.x = event.pageX;
+            mouse.y = event.pageY;
         };
         document.addEventListener("mousemove", handleMouseMove);
 
