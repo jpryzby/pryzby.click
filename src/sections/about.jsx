@@ -1,4 +1,6 @@
 import '../styles/aboutStyle.css';
+import profileImg from '../assets/cool-profile-pictures-fake-smile.webp';
+
 
 export default function About(){
 
@@ -21,7 +23,7 @@ export default function About(){
                 </div>
                 
                 <div className='aboutProfile'>
-                    <img src="src\assets\cool-profile-pictures-fake-smile.webp" alt="Description" />
+                    <img src={profileImg} alt="Description" />
                 </div>
             </div>
 
