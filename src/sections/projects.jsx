@@ -4,6 +4,8 @@ import neuralNetImg from '../assets/Neural Net.png';
 import steganographyImg from '../assets/steganography.png';
 import runescapeImg from '../assets/2004scape.jpeg';
 
+import { Link } from 'react-router-dom';
+
 
 export default function Projects(){
 
@@ -14,7 +16,7 @@ export default function Projects(){
                 <h1>Projects</h1>
             </div>
 
-            <div className='projectContainer'>
+            <Link to="/sportsBetNN" className="projectContainer">
                 <div className='projectText'>
                     <div className='projectTitle'>
                         <h2>Sports Betting Neural Network</h2>
@@ -33,10 +35,10 @@ export default function Projects(){
                 <div className='projectImg'>
                     <img src={neuralNetImg} alt="Description" />
                 </div>
-            </div>
+            </Link>
+            
 
-            <div className='projectContainer'>
-                
+            <Link to="/steganography" className="projectContainer">               
                 <div className='projectImg'>
                     <img src={steganographyImg} alt="Description" />
                 </div>
@@ -60,9 +62,9 @@ export default function Projects(){
                     </div>
                 </div>
                 
-            </div>
+            </Link>
 
-            <div className='projectContainer'>
+            <Link to="/runescapeBot" className="projectContainer">               
                 <div className='projectText'>
                     <div className='projectTitle'>
                         <h2>Runescape Bot</h2>
@@ -86,7 +88,7 @@ export default function Projects(){
                 <div className='projectImg'>
                     <img src={runescapeImg} alt="A profile picture of a nice young man" />
                 </div>
+            </Link>
         </div>
-    </div>
-)
+    )
 }

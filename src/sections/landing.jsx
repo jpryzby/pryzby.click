@@ -107,7 +107,7 @@ export default function Landing(){
     },[])
 
     return(
-        <div className="landingContainer">
+        <div className="landingContainer" id='landingContainer'>
             <canvas ref={canvasRef}>Test</canvas>
             <div className="center-wrapper">
                 <div className="top-text">

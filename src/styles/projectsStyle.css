@@ -76,3 +76,26 @@
     width: 100%;
     object-fit: contain;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+.projectContainer {
+  display: flex;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.projectContainer:hover {
+  transform: scale(1.02);
+  transition: 0.2s ease;
+}
