@@ -18,6 +18,7 @@ let mouseInfluenceRange = window.innerHeight < window.innerWidth ? window.innerH
 let numberOfparticles = Math.max(100,(window.innerHeight * window.innerWidth) / 2500);
 const particleVelocity = 0.2; 
 
+
 console.log("mouseInfluenceRange: " + mouseInfluenceRange);
 console.log("connectionLength: " + connectionLength);
 console.log("numberOfparticles: " + numberOfparticles);
@@ -35,6 +36,10 @@ export default function Landing(){
 
         const canvas = canvasRef.current
         const context = canvas.getContext("2d");
+
+        const text1 = document.getElementById("text1");
+        const text2 = document.getElementById("text2");
+        const text3 = document.getElementById("text3");
         
 
         let gridRows = Math.ceil(window.innerWidth / connectionLength);
@@ -64,11 +69,12 @@ export default function Landing(){
             mouse.y = event.pageY;
         };
         document.addEventListener("mousemove", handleMouseMove);
-
-
+        
         const startTime = performance.now();
         function animate(time){
             requestAnimationFrame(animate);
+
+            
             
             //clear previous frame
             context.clearRect(0,0,innerWidth, innerHeight); 
@@ -376,46 +382,3 @@ function drawConnectionLines(mouse,particleGrid,context){
         }
     }
 }
-
-
-
-// function drawText(context, time) {
-//     context.save();
-
-//     const text1 = "Hi, I'm ";
-//     const text2 = "Jon";
-
-//     const x = innerWidth / 2;
-//     const y = innerHeight / 2;
-
-//     context.font = "bold 64px Arial";
-//     context.textAlign = "left";
-//     context.textBaseline = "middle";
-
-//     // measure widths
-//     const width1 = context.measureText(text1).width;
-//     const width2 = context.measureText(text2).width;
-//     const totalWidth = width1 + width2;
-
-//     let startX = x - totalWidth / 2;
-
-//     // ---- Fade logic ----
-//     // text1: fade in over 2 seconds
-//     const opacity1 = Math.min(1, time / 2000);
-
-//     // text2: wait 5 seconds, then fade in over 2 seconds
-//     const delay = 1000;
-//     const opacity2 = Math.min(1, Math.max(0, (time - delay) / 2000));
-
-//     // ---- Draw text1 ----
-//     context.globalAlpha = opacity1;
-//     context.fillStyle = "rgb(255,255,255)";
-//     context.fillText(text1, startX, y);
-
-//     // ---- Draw text2 ----
-//     context.globalAlpha = opacity2;
-//     context.fillStyle = "rgb(0,150,170)";
-//     context.fillText(text2, startX + width1, y);
-
-//     context.restore();
-// }
