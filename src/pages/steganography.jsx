@@ -16,16 +16,16 @@ export default function Steganography() {
     const [encodeImgPreviewUrl, setEncodeImgPreviewUrl] = useState(null);
     const [txtDragOver, setTxtDragOver] = useState(false);
     const [encodeImgDragOver, setEncodeImgDragOver] = useState(false);
-
+    const txtInputRef = useRef(null);
+    const encodeImgInputRef = useRef(null);
+    
     // Decode state
     const [decodeImgFile, setDecodeImgFile] = useState(null);
     const [decodeImgPreviewUrl, setDecodeImgPreviewUrl] = useState(null);
     const [decodeImgDragOver, setDecodeImgDragOver] = useState(false);
     const [decodedMessage, setDecodedMessage] = useState("");
-
-    const txtInputRef = useRef(null);
-    const encodeImgInputRef = useRef(null);
     const decodeImgInputRef = useRef(null);
+
 
     // --- Text file handlers ---
     const handleTxtFile = (file) => {
@@ -103,83 +103,155 @@ export default function Steganography() {
         if (decodeImgInputRef.current) decodeImgInputRef.current.value = "";
     };
 
+    //encode text file or input text, depending on mode
     const handleEncode = () => {
-
-        const runEncode = (text) => {
-            //Set up download logic
-            const link = document.createElement("a");
-            link.href = encodeImgPreviewUrl;
-            link.download = `encoded_${encodeImgFile.name}`;
-
-            // Set up Encoding visualization
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const img = new Image();
-            img.src = encodeImgPreviewUrl;
-            
-
-            // Draw Image
-            img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-
-                const messageBits = text.split('').map(char =>
-                    char.charCodeAt(0).toString(2).padStart(8, '0')
-                ).join('');
-
-                const totalBits = text.length * 8;
-                const totalPixels = canvas.width * canvas.height;
-                // const totalCapacity = totalPixels * 4 * bitDepth;
-                const pixelsNeeded = Math.ceil(totalBits / (4 * bitDepth));
-
-                if (pixelsNeeded > totalPixels) {
-                    alert("The provided image is not large enough to contain this much text.");
-                    return;
-                }
-
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const pixels = imageData.data;
-
-                for (let index = 0; index < pixelsNeeded; index++) {
-                    const offset = index * 4;
-                    for (let rgba = 0; rgba < 4; rgba++) {
-                        const substringStart = (offset + rgba) * bitDepth;
-                        const substringEnd = substringStart + bitDepth;
-                        const oldColorValue = pixels[offset + rgba].toString(2).padStart(8, '0');
-                        const newColorBits = messageBits.substring(substringStart, substringEnd);
-                        const newColorBase2 = oldColorValue.slice(0, 8 - bitDepth) + newColorBits;
-                        pixels[offset + rgba] = parseInt(newColorBase2, 2);
-                    }
-                }
-
-                ctx.putImageData(imageData, 0, 0);
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            };
-        };
-
-        // if reading from text file, Resolve the message text then run
         if (tab === "type") {
-            console.log("here1");
             runEncode(message);
         } else {
-                        console.log("here2");
-
+            // if reading from text file, Resolve the message text then run
             const reader = new FileReader();
             reader.onload = (e) => runEncode(e.target.result);
             reader.readAsText(txtFile);
         }
     };
 
-    const handleDecode = () => {
-        setDecodedMessage("Hello World");
+    //encode header and message into image
+    const runEncode = (text) => {
+        //Set up download
+        const link = document.createElement("a");
+        link.href = encodeImgPreviewUrl;
+        link.download = `encoded_${encodeImgFile.name}`;
+
+        // Set up Encoding visualization
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.src = encodeImgPreviewUrl;
+        
+
+        // Draw Image
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+
+            //Get metadata
+            const headerLength = 16;
+            const totalBits = (text.length + headerLength) * 16;
+            // const totalBits = text.length * 16;
+            const totalPixels = canvas.width * canvas.height;
+            const pixelsNeeded = Math.ceil(totalBits / (4 * bitDepth));
+
+
+            //if too much text, abort
+            if (pixelsNeeded > totalPixels) {
+                alert("The provided image is not large enough to contain this much text.");
+                return;
+            }
+
+            if (pixelsNeeded > 99999999) {
+                alert("The provided message is too large.");
+                return;
+            }
+
+            //get image data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            // encode header
+            const header = `${String(pixelsNeeded).padStart(16, '0')}`;
+            
+            
+            //get message bits
+            const messageBits = (header + text).split('').map(char =>
+            // const messageBits = (text).split('').map(char =>
+                char.charCodeAt(0).toString(2).padStart(16, '0')
+            ).join('');
+
+            
+
+
+            //encode message
+            //for each pixel, cycle through each color value. 
+            //replace the N least significant bits with the data we are encoding, where N is the bitdepth
+            for (let index = 0; index < pixelsNeeded; index++) {
+                const offset = index * 4;
+                for (let rgba = 0; rgba < 4; rgba++) {
+                    const substringStart = (offset + rgba) * bitDepth;
+                    const substringEnd = substringStart + bitDepth;
+                    const oldColorValue = pixels[offset + rgba].toString(2).padStart(8, '0');
+                    const newColorBits = messageBits.substring(substringStart, substringEnd);
+                    const newColorBase2 = oldColorValue.slice(0, 8 - bitDepth) + newColorBits;
+                    pixels[offset + rgba] = parseInt(newColorBase2, 2);
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        };
     };
 
+    //decode text from image
+    const handleDecode = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = decodeImgPreviewUrl;
+
+        img.onload = () => {
+            //Get image data
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            //Get Header/endpoint
+            let bits = '';
+            for (let i = 0; bits.length < 256; i++) {
+                const offset = i * 4;
+                for (let rgba = 0; rgba < 4; rgba++) {
+                    const pixelValue = pixels[offset + rgba].toString(2).padStart(8, '0');
+                    bits += pixelValue.slice(8 - bitDepth);
+                }
+            }
+            const endpoint = parseInt(bitsToText(bits.substring(0, 256)));
+
+            //Decode text from image
+            bits = '';
+            for (let i = 0; i < endpoint; i++) {
+                const offset = i * 4;
+                for (let rgba = 0; rgba < 4; rgba++) {
+                    const pixelValue = pixels[offset + rgba].toString(2).padStart(8, '0');
+                    bits += pixelValue.slice(8 - bitDepth);
+                }
+            }
+
+            //send output to text box
+            const output = bitsToText(bits).substring(16);
+            setDecodedMessage(output);
+        }
+       
+    };
+
+    // Convert bits to text
+    const bitsToText = (bits) => {
+        let text = '';
+        for (let i = 0; i < bits.length; i += 16) {
+            text += String.fromCharCode(parseInt(bits.slice(i, i + 16), 2));
+        }
+        return text;
+    };
+
+    //handler for go button
     const handleGo = () => {
         if (mode === "encode") {
-            const hasMessage = tab === "type" ? message.trim() !== "" : txtFile !== null;//todo what the f is this?
-            const hasImage = encodeImgFile !== null;
+            const hasMessage = (tab === "type") ? (message !== "") : (txtFile !== null)
+            const hasImage = (encodeImgFile !== null);
 
             if (!hasMessage && !hasImage) {
                 alert("Please provide a message and a cover image.");
