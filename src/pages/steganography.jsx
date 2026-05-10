@@ -141,7 +141,7 @@ export default function Steganography() {
             const totalBits = (text.length + headerLength) * 16;
             // const totalBits = text.length * 16;
             const totalPixels = canvas.width * canvas.height;
-            const pixelsNeeded = Math.ceil(totalBits / (4 * bitDepth));
+            const pixelsNeeded = Math.ceil(totalBits / (3 * bitDepth));
 
 
             //if too much text, abort
@@ -175,19 +175,26 @@ export default function Steganography() {
             //encode message
             //for each pixel, cycle through each color value. 
             //replace the N least significant bits with the data we are encoding, where N is the bitdepth
+            let bitPointer = 0;
             for (let index = 0; index < pixelsNeeded; index++) {
                 const offset = index * 4;
-                for (let rgba = 0; rgba < 4; rgba++) {
-                    const substringStart = (offset + rgba) * bitDepth;
-                    const substringEnd = substringStart + bitDepth;
+                for (let rgba = 0; rgba < 3; rgba++) {
                     const oldColorValue = pixels[offset + rgba].toString(2).padStart(8, '0');
-                    const newColorBits = messageBits.substring(substringStart, substringEnd);
+                    const newColorBits = messageBits.substring(bitPointer, bitPointer + bitDepth);
                     const newColorBase2 = oldColorValue.slice(0, 8 - bitDepth) + newColorBits;
                     pixels[offset + rgba] = parseInt(newColorBase2, 2);
+                    bitPointer += bitDepth;
                 }
             }
 
+            for (let i = 3; i < pixels.length; i += 4) {
+                pixels[i] = 255;
+            }
             ctx.putImageData(imageData, 0, 0);
+
+
+
+
             link.href = canvas.toDataURL("image/png");
             link.click();
         };
@@ -214,7 +221,7 @@ export default function Steganography() {
             let bits = '';
             for (let i = 0; bits.length < 256; i++) {
                 const offset = i * 4;
-                for (let rgba = 0; rgba < 4; rgba++) {
+                for (let rgba = 0; rgba < 3; rgba++) {
                     const pixelValue = pixels[offset + rgba].toString(2).padStart(8, '0');
                     bits += pixelValue.slice(8 - bitDepth);
                 }
@@ -225,7 +232,7 @@ export default function Steganography() {
             bits = '';
             for (let i = 0; i < endpoint; i++) {
                 const offset = i * 4;
-                for (let rgba = 0; rgba < 4; rgba++) {
+                for (let rgba = 0; rgba < 3; rgba++) {
                     const pixelValue = pixels[offset + rgba].toString(2).padStart(8, '0');
                     bits += pixelValue.slice(8 - bitDepth);
                 }
@@ -234,6 +241,7 @@ export default function Steganography() {
             //send output to text box
             const output = bitsToText(bits).substring(16);
             setDecodedMessage(output);
+
         }
        
     };
