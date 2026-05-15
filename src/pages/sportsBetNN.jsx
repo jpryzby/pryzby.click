@@ -1,11 +1,167 @@
 import '../styles/sportsBetNNStyle.css';
-import csvText from '../assets/Training Data 1.csv?raw'
+// import csvText from '../assets/Training Data 2000-2023.csv?raw'
+// import csvText from '../assets/Training Data 2015-2023.csv?raw'
+// import csvText from '../assets/Training Data 2000-2022.csv?raw'
+// import csvText from '../assets/Training Data 2015-2022.csv?raw'
+
+// import testCsvText from '../assets/Testing Data 1999.csv?raw'
+// import testCsvText from '../assets/Testing Data 2014.csv?raw'
+import testCsvText from '../assets/Testing Data 2023.csv?raw'
+
+import networkFile from '../assets/network.json'
+
+
+import { useState } from "react"
+import scalerStats from '../assets/scaler_stats.json'
+import networkData from '../assets/network.json'
 
 import Nav from '../components/nav.jsx';
 import Footer from '../components/footer.jsx';
 
 
+
+
+
+    const TEAMS = [
+        'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets',
+        'Chicago Bulls', 'Cleveland Cavaliers', 'Dallas Mavericks', 'Denver Nuggets',
+        'Detroit Pistons', 'Golden State Warriors', 'Houston Rockets', 'Indiana Pacers',
+        'Los Angeles Clippers', 'Los Angeles Lakers', 'Memphis Grizzlies', 'Miami Heat',
+        'Milwaukee Bucks', 'Minnesota Timberwolves', 'New Orleans Pelicans', 'New York Knicks',
+        'Oklahoma City Thunder', 'Orlando Magic', 'Philadelphia 76ers', 'Phoenix Suns',
+        'Portland Trail Blazers', 'Sacramento Kings', 'San Antonio Spurs', 'Toronto Raptors',
+        'Utah Jazz', 'Washington Wizards'
+    ]
+
+    const AWAY_STATS = [
+        '10 Game Rolling Average Away Team Field Goals Made',
+        '10 Game Rolling Average Away Team Field Goals Attempted',
+        '10 Game Rolling Average Away Team Field Goal Percentage',
+        '10 Game Rolling Average Away Team 3-Point Field Goals Made',
+        '10 Game Rolling Average Away Team 3-Point Field Goals Attempted',
+        '10 Game Rolling Average Away Team 3-Point Percentage',
+        '10 Game Rolling Average Away Team Free Throws Made',
+        '10 Game Rolling Average Away Team Free Throws Attempted',
+        '10 Game Rolling Average Away Team Free Throw Percentage',
+        '10 Game Rolling Average Away Team Offensive Rebounds',
+        '10 Game Rolling Average Away Team Defensive Rebounds',
+        '10 Game Rolling Average Away Team Total Rebounds',
+        '10 Game Rolling Average Away Team Assists',
+        '10 Game Rolling Average Away Team Steals',
+        '10 Game Rolling Average Away Team Blocks',
+        '10 Game Rolling Average Away Team Turnovers',
+        '10 Game Rolling Average Away Team Personal Fouls',
+        '10 Game Rolling Average Away Team Points',
+    ]
+
+    const HOME_STATS = [
+        '10 Game Rolling Average Home Team field goals',
+        '10 Game Rolling Average Home Team Field Goals Attempted',
+        '10 Game Rolling Average Home Team Field Goal Percentage',
+        '10 Game Rolling Average Home Team 3-Point Field Goals Made',
+        '10 Game Rolling Average Home Team 3-Point Field Goals Attempted',
+        '10 Game Rolling Average Home Team 3-Point Percentage',
+        '10 Game Rolling Average Home Team Free Throws Made',
+        '10 Game Rolling Average Home Team Free Throws Attempted',
+        '10 Game Rolling Average Home Team Free Throw Percentage',
+        '10 Game Rolling Average Home Team Offensive Rebounds',
+        '10 Game Rolling Average Home Team Defensive Rebounds',
+        '10 Game Rolling Average Home Team Total Rebounds',
+        '10 Game Rolling Average Home Team Assists',
+        '10 Game Rolling Average Home Team Steals',
+        '10 Game Rolling Average Home Team Blocks',
+        '10 Game Rolling Average Home Team Turnovers',
+        '10 Game Rolling Average Home Team Personal Fouls',
+        '10 Game Rolling Average Home Team Points',
+    ]
+
+
+
+
+
+
+
+
+
+
+
+
 export default function SportsBetNN(){
+
+
+    
+    function shortLabel(col) {
+      return col
+        .replace('10 Game Rolling Average Away Team ', '')
+        .replace('10 Game Rolling Average Home Team ', '')
+        .replace('10 Game Rolling Average ', '')
+    }
+    
+    function normalize(col, value) {
+      const mean = scalerStats.mean[col]
+      const std = scalerStats.std[col]
+      if (mean === undefined || std === undefined) return parseFloat(value) || 0
+      return (parseFloat(value) - mean) / std
+    }
+    
+    function buildInputVector(homeTeam, awayTeam, stats) {
+      // Build the input vector in the same column order as training data
+      // Order: rolling stats (away then home), h2h, home_* one-hots, away_* one-hots
+      const inputs = []
+    
+      // Rolling averages (normalized)
+      for (const col of AWAY_STATS) {
+        inputs.push(normalize(col, stats[col] ?? 0))
+      }
+      for (const col of HOME_STATS) {
+        inputs.push(normalize(col, stats[col] ?? 0))
+      }
+    
+      // h2h_win_ratio_last10 (not normalized, already 0-1)
+      inputs.push(parseFloat(stats['h2h_win_ratio_last10'] ?? 0.5))
+    
+      // home team one-hot
+      for (const team of TEAMS) {
+        inputs.push(team === homeTeam ? 1 : 0)
+      }
+    
+      // away team one-hot
+      for (const team of TEAMS) {
+        inputs.push(team === awayTeam ? 1 : 0)
+      }
+    
+      return inputs
+    }
+    
+
+    const [homeTeam, setHomeTeam] = useState(TEAMS[0])
+      const [awayTeam, setAwayTeam] = useState(TEAMS[1])
+      const [stats, setStats] = useState({})
+      const [result, setResult] = useState(null)
+    
+      const allStats = [...AWAY_STATS, ...HOME_STATS, 'h2h_win_ratio_last10']
+    
+      function handleStatChange(col, value) {
+        setStats(prev => ({ ...prev, [col]: value }))
+      }
+    
+      function predict() {
+        const inputs = buildInputVector(homeTeam, awayTeam, stats)
+        // Deep clone network so feedforward doesn't mutate the imported object permanently
+        const network = JSON.parse(JSON.stringify(networkData))
+        const output = feedforward(network, inputs)
+        setResult(output)
+      }
+    
+      const confidence = result !== null ? Math.abs(result - 0.5) * 200 : null
+      const winner = result !== null ? (result >= 0.5 ? homeTeam : awayTeam) : null
+
+
+    // const trainingData = loadCSV(csvText)
+    const testData = loadCSV(testCsvText)
+
+    
+
 
     //return random number from -1 to 1
     function randomWeight() {
@@ -33,24 +189,51 @@ export default function SportsBetNN(){
 
     // Weight matrices (one per layer transition)
     // Bias arrays (one per layer)
-    const network = {
-        layers: [
-            new Array(103).fill(0),  // input layer
-            new Array(64).fill(0),  // hidden layer 1
-            new Array(32).fill(0),  // hidden layer 2
-            new Array(1).fill(0),   // output layer
-        ],
-        weights: [
-            makeMatrix(103, 64),  // input → hidden 1
-            makeMatrix(64, 32),  // hidden 1 → hidden 2
-            makeMatrix(32, 1),   // hidden 2 → output
-        ],
-        biases: [
-            makeBiases(64),  // hidden layer 1
-            makeBiases(32),  // hidden layer 2
-            makeBiases(1),   // output layer
-        ]
-    }
+    // const network = {
+    //     layers: [
+    //         new Array(101).fill(0),  // input layer
+    //         new Array(128).fill(0),  // hidden layer 1
+    //         new Array(64).fill(0),  // hidden layer 1
+    //         new Array(32).fill(0),  // hidden layer 2
+    //         new Array(1).fill(0),   // output layer
+    //     ],
+    //     weights: [
+    //         makeMatrix(101, 128),  // input → hidden 1
+    //         makeMatrix(128, 64),  // hidden 1 → hidden 2
+    //         makeMatrix(64, 32),  // hidden 1 → hidden 2
+    //         makeMatrix(32, 1),   // hidden 2 → output
+    //     ],
+    //     biases: [
+    //         makeBiases(128),  // hidden layer 1
+    //         makeBiases(64),  // hidden layer 1
+    //         makeBiases(32),  // hidden layer 2
+    //         makeBiases(1),   // output layer
+    //     ]
+    // }
+
+    // const network = {
+    //     layers: [
+    //         new Array(101).fill(0),  // input layer
+    //         // new Array(128).fill(0),  // hidden layer 1
+    //         new Array(64).fill(0),  // hidden layer 1
+    //         new Array(32).fill(0),  // hidden layer 2
+    //         new Array(1).fill(0),   // output layer
+    //     ],
+    //     weights: [
+    //         makeMatrix(101, 64),  // input → hidden 1
+    //         // makeMatrix(128, 64),  // hidden 1 → hidden 2
+    //         makeMatrix(64, 32),  // hidden 1 → hidden 2
+    //         makeMatrix(32, 1),   // hidden 2 → output
+    //     ],
+    //     biases: [
+    //         // makeBiases(128),  // hidden layer 1
+    //         makeBiases(64),  // hidden layer 1
+    //         makeBiases(32),  // hidden layer 2
+    //         makeBiases(1),   // output layer
+    //     ]
+    // }
+
+    const network = networkFile;
 
     function getNetworkOutput(network) {
         return (network.layers[network.layers.length - 1][0]);
@@ -279,6 +462,17 @@ export default function SportsBetNN(){
     // }
 
 
+    //adjusts training data such that there is an even spread of at home wins and away wins
+    function balanceData(trainingData) {
+        const homeWins = trainingData.filter(g => g.expected === 1)
+        const awayWins = trainingData.filter(g => g.expected === 0)
+        
+        // trim home wins to match away win count
+        const shuffledHome = homeWins.sort(() => Math.random() - 0.5)
+        const balanced = [...shuffledHome.slice(0, awayWins.length), ...awayWins]
+        return balanced.sort(() => Math.random() - 0.5)
+    }
+
 
 
    function train(network, trainingData, learningRate, epochNumber) {
@@ -291,16 +485,27 @@ export default function SportsBetNN(){
 
         let epochCost = 0  // ← add this
 
+        let winRate = 0
+
         for (let batch of batches) {
             let totalWeightDeltas = network.weights.map(matrix =>
                 matrix.map(row => row.map(() => 0))
             )
             let totalBiasDeltas = network.biases.map(arr => arr.map(() => 0))
             let batchCost = 0
+            
 
             for (let game of batch) {
                 feedforward(network, game.inputs)
                 batchCost += cost(getNetworkOutput(network), game.expected)
+                 
+                winRate += Math.round(getNetworkOutput(network)) == game.expected 
+                
+
+
+
+
+
                 const [wDeltas, bDeltas] = getDeltas(network, game.expected)
 
                 for (let l = 0; l < totalWeightDeltas.length; l++) {
@@ -321,15 +526,19 @@ export default function SportsBetNN(){
             }
 
             gradientDescent(network, totalWeightDeltas, totalBiasDeltas, learningRate)
-            epochCost += batchCost / batchSize  // ← add this
+            epochCost += batchCost / batchSize 
             }
+
         }
+
+        winRate /= shuffled.length;
+        console.log(" win rate: " + winRate);
 
         const avgCost = epochCost / batches.length  // ← add this
         console.log(`Epoch ${epochNumber} — avg cost: ${avgCost.toFixed(4)}`)
         return avgCost  // ← add this
 
-}
+    }
 
 
 
@@ -353,6 +562,38 @@ export default function SportsBetNN(){
     }
 
 
+
+    function testNetwork(network, testData) {
+        let correct = 0
+        let truePositives = 0   // predicted home win, was home win
+        let falsePositives = 0  // predicted home win, was away win
+        let trueNegatives = 0   // predicted away win, was away win
+        let falseNegatives = 0  // predicted away win, was home win
+
+        for (let game of testData) {
+            const output = feedforward(network, game.inputs)
+            const predicted = output >= 0.5 ? 1 : 0
+
+            if (predicted === game.expected) correct++
+
+            if (predicted === 1 && game.expected === 1) truePositives++
+            if (predicted === 1 && game.expected === 0) falsePositives++
+            if (predicted === 0 && game.expected === 0) trueNegatives++
+            if (predicted === 0 && game.expected === 1) falseNegatives++
+        }
+
+        const total = testData.length
+        console.log('--- Test Results ---')
+        console.log(`Total games tested: ${total}`)
+        console.log(`Overall accuracy:   ${(correct / total * 100).toFixed(1)}%`)
+        console.log(`Home win accuracy:  ${(truePositives / (truePositives + falseNegatives) * 100).toFixed(1)}%`)
+        console.log(`Away win accuracy:  ${(trueNegatives / (trueNegatives + falsePositives) * 100).toFixed(1)}%`)
+    }
+
+
+
+
+
     function loadCSV(csvText) {
         const lines = csvText.trim().split('\n')
         const data = []
@@ -360,17 +601,41 @@ export default function SportsBetNN(){
         for (let i = 1; i < lines.length; i++) {
             const cols = lines[i].split(',')
             const expected = parseFloat(cols[0])
-            const inputs = cols.slice(1, 104).map(parseFloat)
+            const inputs = cols.slice(1, 102).map(parseFloat)
 
-            if (inputs.length === 103 && !inputs.some(isNaN) && !isNaN(expected)) {
+            if (inputs.length === 101 && !inputs.some(isNaN) && !isNaN(expected)) {
                 data.push({ inputs, expected })
             }
         }
         return data
     }
 
-    const trainingData = loadCSV(csvText)
+        // Save to a JSON file download
+    function saveNetwork(network) {
+        const json = JSON.stringify(network)
+        const blob = new Blob([json], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'network.json'
+        a.click()
+        URL.revokeObjectURL(url)
+    }
 
+    // Load from a JSON file
+    function loadNetwork(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                const loaded = JSON.parse(e.target.result)
+                resolve(loaded)
+            }
+            reader.readAsText(file)
+        })
+    }
+
+
+    
 
 
     return(
@@ -382,11 +647,224 @@ export default function SportsBetNN(){
                     <h1>Project Title</h1>
                 </div>
                 <div className='projectBody'>
-                    <p>project body</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style={{
+      minHeight: '100vh',
+      background: '#0a0a0f',
+      color: '#e8e8f0',
+      fontFamily: "'Courier New', monospace",
+      padding: '2rem'
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div style={{ fontSize: 11, letterSpacing: 8, color: '#555', marginBottom: 8 }}>NBA NEURAL NETWORK</div>
+          <h1 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: 2, color: '#fff' }}>
+            GAME PREDICTOR
+          </h1>
+          <div style={{ width: 60, height: 2, background: '#3b82f6', margin: '12px auto 0' }} />
+        </div>
+
+        {/* Team selectors */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 1fr', gap: '1rem', marginBottom: '2rem', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: '#3b82f6', marginBottom: 8 }}>AWAY TEAM</div>
+            <select
+              value={awayTeam}
+              onChange={e => setAwayTeam(e.target.value)}
+              style={{
+                width: '100%', padding: '12px 16px', background: '#13131a',
+                border: '1px solid #2a2a3a', color: '#e8e8f0', fontSize: 14,
+                borderRadius: 4, cursor: 'pointer'
+              }}
+            >
+              {TEAMS.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div style={{ textAlign: 'center', color: '#444', fontSize: 18, fontWeight: 900 }}>@</div>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: '#10b981', marginBottom: 8 }}>HOME TEAM</div>
+            <select
+              value={homeTeam}
+              onChange={e => setHomeTeam(e.target.value)}
+              style={{
+                width: '100%', padding: '12px 16px', background: '#13131a',
+                border: '1px solid #2a2a3a', color: '#e8e8f0', fontSize: 14,
+                borderRadius: 4, cursor: 'pointer'
+              }}
+            >
+              {TEAMS.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Stats columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+
+          {/* Away column */}
+          <div style={{ background: '#13131a', border: '1px solid #2a2a3a', borderRadius: 6, padding: '1.5rem' }}>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: '#3b82f6', marginBottom: '1.2rem' }}>
+              AWAY — {awayTeam.toUpperCase()}
+            </div>
+            {AWAY_STATS.map(col => (
+              <div key={col} style={{ marginBottom: '0.9rem' }}>
+                <div style={{ fontSize: 10, color: '#666', marginBottom: 4, letterSpacing: 1 }}>
+                  {shortLabel(col).toUpperCase()}
+                </div>
+                <input
+                  type="number"
+                  value={stats[col] ?? ''}
+                  onChange={e => handleStatChange(col, e.target.value)}
+                  placeholder="—"
+                  style={{
+                    width: '100%', padding: '8px 12px', background: '#0a0a0f',
+                    border: '1px solid #1e1e2e', color: '#e8e8f0', fontSize: 13,
+                    borderRadius: 3, boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Home column */}
+          <div style={{ background: '#13131a', border: '1px solid #2a2a3a', borderRadius: 6, padding: '1.5rem' }}>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: '#10b981', marginBottom: '1.2rem' }}>
+              HOME — {homeTeam.toUpperCase()}
+            </div>
+            {HOME_STATS.map(col => (
+              <div key={col} style={{ marginBottom: '0.9rem' }}>
+                <div style={{ fontSize: 10, color: '#666', marginBottom: 4, letterSpacing: 1 }}>
+                  {shortLabel(col).toUpperCase()}
+                </div>
+                <input
+                  type="number"
+                  value={stats[col] ?? ''}
+                  onChange={e => handleStatChange(col, e.target.value)}
+                  placeholder="—"
+                  style={{
+                    width: '100%', padding: '8px 12px', background: '#0a0a0f',
+                    border: '1px solid #1e1e2e', color: '#e8e8f0', fontSize: 13,
+                    borderRadius: 3, boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            ))}
+
+            {/* H2H at bottom of home column */}
+            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #1e1e2e' }}>
+              <div style={{ fontSize: 10, color: '#666', marginBottom: 4, letterSpacing: 1 }}>
+                H2H WIN RATIO (LAST 10)
+              </div>
+              <input
+                type="number"
+                min="0" max="1" step="0.1"
+                value={stats['h2h_win_ratio_last10'] ?? ''}
+                onChange={e => handleStatChange('h2h_win_ratio_last10', e.target.value)}
+                placeholder="0.0 – 1.0"
+                style={{
+                  width: '100%', padding: '8px 12px', background: '#0a0a0f',
+                  border: '1px solid #1e1e2e', color: '#e8e8f0', fontSize: 13,
+                  borderRadius: 3, boxSizing: 'border-box', outline: 'none'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Predict button */}
+        <button
+          onClick={predict}
+          style={{
+            width: '100%', padding: '16px', background: '#3b82f6',
+            border: 'none', color: '#fff', fontSize: 13, fontWeight: 700,
+            letterSpacing: 4, cursor: 'pointer', borderRadius: 4,
+            fontFamily: "'Courier New', monospace", marginBottom: '2rem'
+          }}
+        >
+          RUN PREDICTION
+        </button>
+
+        {/* Result */}
+        {result !== null && (
+          <div style={{
+            background: '#13131a', border: `1px solid ${result >= 0.5 ? '#10b981' : '#3b82f6'}`,
+            borderRadius: 6, padding: '2rem', textAlign: 'center'
+          }}>
+            <div style={{ fontSize: 10, letterSpacing: 4, color: '#555', marginBottom: 12 }}>PREDICTION</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: result >= 0.5 ? '#10b981' : '#3b82f6', marginBottom: 8 }}>
+              {winner}
+            </div>
+            <div style={{ fontSize: 12, color: '#666', marginBottom: 20 }}>
+              {result >= 0.5 ? 'HOME WIN' : 'AWAY WIN'}
+            </div>
+
+            {/* Confidence bar */}
+            <div style={{ fontSize: 10, letterSpacing: 4, color: '#555', marginBottom: 8 }}>
+              NETWORK OUTPUT: {result.toFixed(4)}
+            </div>
+            <div style={{ background: '#0a0a0f', borderRadius: 2, height: 6, overflow: 'hidden', marginBottom: 8 }}>
+              <div style={{
+                height: '100%', width: `${result * 100}%`,
+                background: result >= 0.5 ? '#10b981' : '#3b82f6',
+                transition: 'width 0.5s ease'
+              }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#333' }}>
+              <span>AWAY</span>
+              <span>HOME</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 </div>
 
 
-                <button onClick={() => runEpochs(network, trainingData, 0.02, 50)}>Train</button>
+                {/* <button onClick={() => runEpochs(network, balanceData(trainingData), 0.02, 20)}>Train Balanced Data</button> */}
+                {/* <button onClick={() => runEpochs(network, trainingData, 0.02, 20)}>Train Raw Data</button> */}
+
+                <button onClick={() => testNetwork(network, testData)}>Test</button>
+
+
+                <button onClick={() => console.log(JSON.stringify(network, null, 2))}>Print</button>                
+                <button onClick={() => saveNetwork(network)}>Save</button>
 
 
 
