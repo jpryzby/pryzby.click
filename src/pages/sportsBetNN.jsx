@@ -1,4 +1,4 @@
-import '../styles/sportsBetNNStyle.css';
+import '../styles/sportsBetNNStyle.css'
 // import csvText from '../assets/Training Data 2000-2023.csv?raw'
 // import csvText from '../assets/Training Data 2015-2023.csv?raw'
 // import csvText from '../assets/Training Data 2000-2022.csv?raw'
@@ -154,6 +154,7 @@ export default function SportsBetNN(){
       }
     
       const confidence = result !== null ? Math.abs(result - 0.5) * 200 : null
+      const isHomeWin = result !== null && result >= 0.5
       const winner = result !== null ? (result >= 0.5 ? homeTeam : awayTeam) : null
 
 
@@ -638,6 +639,7 @@ export default function SportsBetNN(){
     
 
 
+
     return(
             <div className='pageContainer'>
                 
@@ -659,52 +661,35 @@ export default function SportsBetNN(){
 
 
 
-
-<div style={{
-      minHeight: '100vh',
-      background: '#0a0a0f',
-      color: '#e8e8f0',
-      fontFamily: "'Courier New', monospace",
-      padding: '2rem'
-    }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+<div className='gpWrapper'>
+      <div className='gpInner'>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ fontSize: 11, letterSpacing: 8, color: '#555', marginBottom: 8 }}>NBA NEURAL NETWORK</div>
-          <h1 style={{ fontSize: 36, fontWeight: 900, margin: 0, letterSpacing: 2, color: '#fff' }}>
-            GAME PREDICTOR
-          </h1>
-          <div style={{ width: 60, height: 2, background: '#3b82f6', margin: '12px auto 0' }} />
+        <div className='gpHeader'>
+          <div className='gpHeaderEyebrow'>NBA NEURAL NETWORK</div>
+          <h1 className='gpHeaderTitle'>GAME PREDICTOR</h1>
+          <div className='gpHeaderRule' />
         </div>
 
         {/* Team selectors */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 1fr', gap: '1rem', marginBottom: '2rem', alignItems: 'center' }}>
+        <div className='gpTeamGrid'>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: '#3b82f6', marginBottom: 8 }}>AWAY TEAM</div>
+            <div className='gpTeamLabel gpTeamLabelHome'>HOME TEAM</div>
             <select
-              value={awayTeam}
-              onChange={e => setAwayTeam(e.target.value)}
-              style={{
-                width: '100%', padding: '12px 16px', background: '#13131a',
-                border: '1px solid #2a2a3a', color: '#e8e8f0', fontSize: 14,
-                borderRadius: 4, cursor: 'pointer'
-              }}
+              value={homeTeam}
+              onChange={e => setHomeTeam(e.target.value)}
+              className='gpTeamSelect'
             >
               {TEAMS.map(t => <option key={t}>{t}</option>)}
             </select>
           </div>
-          <div style={{ textAlign: 'center', color: '#444', fontSize: 18, fontWeight: 900 }}>@</div>
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: '#10b981', marginBottom: 8 }}>HOME TEAM</div>
+          <div className='gpTeamVs'>VS</div>
+            <div>
+            <div className='gpTeamLabel gpTeamLabelAway'>AWAY TEAM</div>
             <select
-              value={homeTeam}
-              onChange={e => setHomeTeam(e.target.value)}
-              style={{
-                width: '100%', padding: '12px 16px', background: '#13131a',
-                border: '1px solid #2a2a3a', color: '#e8e8f0', fontSize: 14,
-                borderRadius: 4, cursor: 'pointer'
-              }}
+              value={awayTeam}
+              onChange={e => setAwayTeam(e.target.value)}
+              className='gpTeamSelect'
             >
               {TEAMS.map(t => <option key={t}>{t}</option>)}
             </select>
@@ -712,141 +697,100 @@ export default function SportsBetNN(){
         </div>
 
         {/* Stats columns */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div className='gpStatsGrid'>
 
-          {/* Away column */}
-          <div style={{ background: '#13131a', border: '1px solid #2a2a3a', borderRadius: 6, padding: '1.5rem' }}>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: '#3b82f6', marginBottom: '1.2rem' }}>
-              AWAY — {awayTeam.toUpperCase()}
-            </div>
-            {AWAY_STATS.map(col => (
-              <div key={col} style={{ marginBottom: '0.9rem' }}>
-                <div style={{ fontSize: 10, color: '#666', marginBottom: 4, letterSpacing: 1 }}>
-                  {shortLabel(col).toUpperCase()}
-                </div>
-                <input
-                  type="number"
-                  value={stats[col] ?? ''}
-                  onChange={e => handleStatChange(col, e.target.value)}
-                  placeholder="—"
-                  style={{
-                    width: '100%', padding: '8px 12px', background: '#0a0a0f',
-                    border: '1px solid #1e1e2e', color: '#e8e8f0', fontSize: 13,
-                    borderRadius: 3, boxSizing: 'border-box',
-                    outline: 'none'
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+          
 
           {/* Home column */}
-          <div style={{ background: '#13131a', border: '1px solid #2a2a3a', borderRadius: 6, padding: '1.5rem' }}>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: '#10b981', marginBottom: '1.2rem' }}>
+          <div className='gpStatsColumn'>
+            <div className='gpStatsColumnHeader gpStatsColumnHeaderHome'>
               HOME — {homeTeam.toUpperCase()}
             </div>
             {HOME_STATS.map(col => (
-              <div key={col} style={{ marginBottom: '0.9rem' }}>
-                <div style={{ fontSize: 10, color: '#666', marginBottom: 4, letterSpacing: 1 }}>
-                  {shortLabel(col).toUpperCase()}
-                </div>
+              <div key={col} className='gpStatRow'>
+                <div className='gpStatLabel'>{shortLabel(col).toUpperCase()}</div>
                 <input
-                  type="number"
+                  type='number'
                   value={stats[col] ?? ''}
                   onChange={e => handleStatChange(col, e.target.value)}
-                  placeholder="—"
-                  style={{
-                    width: '100%', padding: '8px 12px', background: '#0a0a0f',
-                    border: '1px solid #1e1e2e', color: '#e8e8f0', fontSize: 13,
-                    borderRadius: 3, boxSizing: 'border-box',
-                    outline: 'none'
-                  }}
+                  placeholder='—'
+                  className='gpStatInput'
                 />
               </div>
             ))}
 
-            {/* H2H at bottom of home column */}
-            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #1e1e2e' }}>
-              <div style={{ fontSize: 10, color: '#666', marginBottom: 4, letterSpacing: 1 }}>
-                H2H WIN RATIO (LAST 10)
-              </div>
+            {/* H2H */}
+            <div className='gpH2hSection'>
+              <div className='gpStatLabel'>H2H WIN RATIO (LAST 10)</div>
               <input
-                type="number"
-                min="0" max="1" step="0.1"
+                type='number'
+                min='0' max='1' step='0.1'
                 value={stats['h2h_win_ratio_last10'] ?? ''}
                 onChange={e => handleStatChange('h2h_win_ratio_last10', e.target.value)}
-                placeholder="0.0 – 1.0"
-                style={{
-                  width: '100%', padding: '8px 12px', background: '#0a0a0f',
-                  border: '1px solid #1e1e2e', color: '#e8e8f0', fontSize: 13,
-                  borderRadius: 3, boxSizing: 'border-box', outline: 'none'
-                }}
+                placeholder='0.0 – 1.0'
+                className='gpStatInput'
               />
             </div>
           </div>
+
+        {/* Away column */}
+          <div className='gpStatsColumn'>
+            <div className='gpStatsColumnHeader gpStatsColumnHeaderAway'>
+              AWAY — {awayTeam.toUpperCase()}
+            </div>
+            {AWAY_STATS.map(col => (
+              <div key={col} className='gpStatRow'>
+                <div className='gpStatLabel'>{shortLabel(col).toUpperCase()}</div>
+                <input
+                  type='number'
+                  value={stats[col] ?? ''}
+                  onChange={e => handleStatChange(col, e.target.value)}
+                  placeholder='—'
+                  className='gpStatInput'
+                />
+              </div>
+            ))}
+          </div>
+
+
+
+
+
         </div>
 
         {/* Predict button */}
-        <button
-          onClick={predict}
-          style={{
-            width: '100%', padding: '16px', background: '#3b82f6',
-            border: 'none', color: '#fff', fontSize: 13, fontWeight: 700,
-            letterSpacing: 4, cursor: 'pointer', borderRadius: 4,
-            fontFamily: "'Courier New', monospace", marginBottom: '2rem'
-          }}
-        >
+        <button onClick={predict} className='gpPredictButton'>
           RUN PREDICTION
         </button>
 
         {/* Result */}
         {result !== null && (
-          <div style={{
-            background: '#13131a', border: `1px solid ${result >= 0.5 ? '#10b981' : '#3b82f6'}`,
-            borderRadius: 6, padding: '2rem', textAlign: 'center'
-          }}>
-            <div style={{ fontSize: 10, letterSpacing: 4, color: '#555', marginBottom: 12 }}>PREDICTION</div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: result >= 0.5 ? '#10b981' : '#3b82f6', marginBottom: 8 }}>
+          <div className={`gpResultBox ${isHomeWin ? 'gpResultBoxHome' : 'gpResultBoxAway'}`}>
+            <div className='gpResultEyebrow'>PREDICTION</div>
+            <div className={`gpResultWinner ${isHomeWin ? 'gpResultWinnerHome' : 'gpResultWinnerAway'}`}>
               {winner}
             </div>
-            <div style={{ fontSize: 12, color: '#666', marginBottom: 20 }}>
-              {result >= 0.5 ? 'HOME WIN' : 'AWAY WIN'}
+            <div className='gpResultOutcome'>
+              {isHomeWin ? 'HOME WIN' : 'AWAY WIN'}
             </div>
-
-            {/* Confidence bar */}
-            <div style={{ fontSize: 10, letterSpacing: 4, color: '#555', marginBottom: 8 }}>
+            <div className='gpResultOutput'>
               NETWORK OUTPUT: {result.toFixed(4)}
             </div>
-            <div style={{ background: '#0a0a0f', borderRadius: 2, height: 6, overflow: 'hidden', marginBottom: 8 }}>
-              <div style={{
-                height: '100%', width: `${result * 100}%`,
-                background: result >= 0.5 ? '#10b981' : '#3b82f6',
-                transition: 'width 0.5s ease'
-              }} />
+            <div className='gpConfidenceTrack'>
+              <div
+                className={`gpConfidenceFill ${isHomeWin ? 'gpConfidenceFillHome' : 'gpConfidenceFillAway'}`}
+                style={{ width: `${result * 100}%` }}
+              />
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#333' }}>
+            <div className='gpConfidenceLabels'>
               <span>AWAY</span>
               <span>HOME</span>
             </div>
           </div>
         )}
+
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
