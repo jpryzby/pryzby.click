@@ -1,4 +1,4 @@
-import '../styles/navStyle.css';
+import './navStyle.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Nav() {

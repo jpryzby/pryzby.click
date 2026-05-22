@@ -1,13 +1,13 @@
-import '../styles/homeStyle.css';
+import './homeStyle.css';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import Nav from '../components/nav.jsx';
-import Footer from '../components/footer.jsx';
-import About from '../sections/about.jsx';
-import Projects from '../sections/projects.jsx';
-import Contact from '../sections/contact.jsx';
-import Landing from '../sections/landing.jsx';
+import Nav from '../../components/nav/nav.jsx';
+import Footer from '../../components/footer/footer.jsx';
+import About from './sections/about.jsx';
+import Projects from './sections/projects.jsx';
+import Contact from './sections/contact.jsx';
+import Landing from './sections/landing.jsx';
 
 export default function Home() {
     const location = useLocation();

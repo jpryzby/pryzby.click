@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
-import Home from './pages/home'
-import Landing from './sections/landing'
-import About from './sections/about'
-import Projects from './sections/projects'
-import Contact from './sections/contact'
+import Home from './pages/Home/home'
+import Landing from './pages/Home/sections/landing'
+import About from './pages/Home/sections/about'
+import Projects from './pages/Home/sections/projects'
+import Contact from './pages/Home/sections/contact'
 import Steganography from './pages/steganography/steganography'
 
 

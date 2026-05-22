@@ -1,6 +1,6 @@
 //TODO fix frame count
 
-import '../styles/landingStyle.css';
+import './landingStyle.css';
 
 import {useRef, useEffect} from 'react';
 

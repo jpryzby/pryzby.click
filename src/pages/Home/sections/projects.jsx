@@ -1,8 +1,8 @@
-import '../styles/projectsStyle.css';
+import './projectsStyle.css';
 
-import neuralNetImg from '../assets/Neural Net.png';
-import steganographyImg from '../assets/steganography.png';
-import runescapeImg from '../assets/2004scape.jpeg';
+import neuralNetImg from '../../../assets/Neural Net.png';
+import steganographyImg from '../../../assets/steganography.png';
+import runescapeImg from '../../../assets/2004scape.jpeg';
 
 import { Link } from 'react-router-dom';
 

@@ -1,6 +1,6 @@
 import './runescapeBotStyle.css';
-import Nav from '../../components/nav.jsx';
-import Footer from '../../components/footer.jsx';
+import Nav from '../../components/nav/nav.jsx';
+import Footer from '../../components/footer/footer.jsx';
 
 
 export default function RunescapeBot(){

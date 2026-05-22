@@ -1,6 +1,6 @@
 import './steganographyStyle.css';
-import Nav from '../../components/nav.jsx';
-import TableOfContents from '../tableOfContents.jsx';
+import Nav from '../../components/nav/nav.jsx';
+import TableOfContents from '../../components/tableOfContents/tableOfContents.jsx';
 import { useState, useRef } from "react";
 
 export default function Steganography() {

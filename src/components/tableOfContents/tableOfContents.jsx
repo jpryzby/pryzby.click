@@ -1,4 +1,4 @@
-import '../styles/tableOfContents.css';
+import './tableOfContents.css';
 
 
 

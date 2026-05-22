@@ -1,5 +1,5 @@
-import '../styles/aboutStyle.css';
-import profileImg from '../assets/cool-profile-pictures-fake-smile.webp';
+import './aboutStyle.css';
+import profileImg from '../../../assets/cool-profile-pictures-fake-smile.webp';
 
 
 export default function About(){

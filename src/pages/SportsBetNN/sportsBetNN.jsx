@@ -1,4 +1,4 @@
-import '../styles/sportsBetNNStyle.css'
+import './sportsBetNNStyle.css'
 // import csvText from '../assets/Training Data 2000-2023.csv?raw'
 // import csvText from '../assets/Training Data 2015-2023.csv?raw'
 // import csvText from '../assets/Training Data 2000-2022.csv?raw'
@@ -6,17 +6,17 @@ import '../styles/sportsBetNNStyle.css'
 
 // import testCsvText from '../assets/Testing Data 1999.csv?raw'
 // import testCsvText from '../assets/Testing Data 2014.csv?raw'
-import testCsvText from '../assets/Testing Data 2023.csv?raw'
+import testCsvText from '../../assets/Testing Data 2023.csv?raw'
 
-import networkFile from '../assets/network.json'
+import networkFile from '../../assets/network.json'
 
 
 import { useState } from "react"
-import scalerStats from '../assets/scaler_stats.json'
-import networkData from '../assets/network.json'
+import scalerStats from '../../assets/scaler_stats.json'
+import networkData from '../../assets/network.json'
 
-import Nav from '../components/nav.jsx';
-import Footer from '../components/footer.jsx';
+import Nav from '../../components/nav/nav.jsx';
+import Footer from '../../components/footer/footer.jsx';
 
 
 
