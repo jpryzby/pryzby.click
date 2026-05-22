@@ -1,0 +1,273 @@
+p{
+    text-indent: 2em;
+    color: #ddd;
+}
+
+.projectTitle {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #262626;
+    padding: 36px;
+}
+
+.projectTitle h1 {
+    color: #5f92bd;
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.projectBody{
+    padding: 100px;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #262626;
+}
+
+.projectDescription,
+.projectInstructions,
+.projectImprovements {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+
+    background-color: #262626;
+    padding: 24px;
+
+    border: 3px solid rgba(165, 25, 145);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+}
+
+.projectParagraph {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    gap: 16px; 
+}
+
+.projectDescription h2,
+.projectInstructions h2,
+.projectImprovements h2 {
+    color: #5f92bd;
+    margin-bottom: 12px;
+}
+
+.projectDescription p,
+.projectInstructions p {
+    text-indent: 2em;
+    color: #ddd;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.steg-root {
+    padding: 1.5rem 0;
+    font-family: monospace;
+}
+
+.steg-section-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    margin: 0 0 10px;
+}
+
+.steg-panel {
+    background: #fff;
+    border: 0.5px solid #ddd;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.steg-tab-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1rem;
+}
+
+.steg-tab {
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 8px;
+    border: 0.5px solid #ccc;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.15s;
+}
+
+.steg-tab--active {
+    background: #f5f5f5;
+    color: #111;
+    border-color: #aaa;
+}
+
+.steg-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 120px;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.steg-char-count {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 6px;
+    text-align: right;
+}
+
+.steg-drop-zone {
+    border: 0.5px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.steg-drop-zone--hover {
+    border-color: #aaa;
+    background: #f5f5f5;
+}
+
+.steg-hidden-input {
+    display: none;
+}
+
+.steg-drop-icon {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.steg-drop-label {
+    font-size: 13px;
+    color: #666;
+}
+
+.steg-drop-hint {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 4px;
+}
+
+.steg-file-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 4px 10px;
+    background: #f5f5f5;
+    border: 0.5px solid #ddd;
+    border-radius: 8px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.steg-file-badge--remove {
+    cursor: pointer;
+    margin-top: 0;
+}
+
+.steg-img-file-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.steg-remove-btn {
+    cursor: pointer;
+    color: #aaa;
+    font-size: 14px;
+    background: none;
+    border: none;
+    padding: 0 2px;
+}
+
+.steg-preview {
+    max-width: 100%;
+    max-height: 160px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: block;
+    border: 0.5px solid #ddd;
+}
+
+
+.steg-mode-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.steg-mode-btn {
+    font-size: 14px;
+    padding: 8px 24px;
+    border-radius: 8px;
+    border: 0.5px solid #ccc;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.15s;
+}
+
+.steg-mode-btn--active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+.steg-textarea--readonly {
+    background: #f5f5f5;
+    color: #444;
+    cursor: default;
+}
+
+.steg-go-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+.steg-go-btn {
+    font-size: 14px;
+    padding: 8px 32px;
+    border-radius: 8px;
+    border: 0.5px solid #111;
+    background: #111;
+    border-color: #FFF;
+    color: #fff;
+    cursor: pointer;
+    font-family: monospace;
+    transition: all 0.15s;
+}
+
+.steg-go-btn:hover {
+    background: #333;
+    border-color: #FFF;
+}
+
+.steg-bit-depth-label {
+    font-size: 14px;
+    padding: 8px 24px;
+    border-radius: 8px;
+    border: 0.5px solid #fff;
+    /* background: #111; */
+    color: #fff;
+    font-family: monospace;
+}

@@ -6,9 +6,11 @@ import Landing from './sections/landing'
 import About from './sections/about'
 import Projects from './sections/projects'
 import Contact from './sections/contact'
-import Steganography from './pages/steganography'
-import SportsBetNN from './pages/sportsBetNN'
-import RunescapeBot from './pages/runescapeBot'
+import Steganography from './pages/steganography/steganography'
+
+
+import SportsBetNN from './pages/SportsBetNN/sportsBetNN'
+import RunescapeBot from './pages/RSBot/runescapeBot'
 
 
 
