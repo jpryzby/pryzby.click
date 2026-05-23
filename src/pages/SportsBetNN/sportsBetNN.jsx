@@ -1,14 +1,19 @@
 import './sportsBetNNStyle.css'
-// import csvText from '../assets/Training Data 2000-2023.csv?raw'
-// import csvText from '../assets/Training Data 2015-2023.csv?raw'
-// import csvText from '../assets/Training Data 2000-2022.csv?raw'
-// import csvText from '../assets/Training Data 2015-2022.csv?raw'
+import NeuralNetworkViz from "./NNVizualizer";
 
-// import testCsvText from '../assets/Testing Data 1999.csv?raw'
-// import testCsvText from '../assets/Testing Data 2014.csv?raw'
+// import csvText from './assets/Training Data 2000-2023.csv?raw'
+// import csvText from './assets/Training Data 2015-2023.csv?raw'
+import csvText from './assets/Training Data 2000-2022.csv?raw'
+// import csvText from './assets/Training Data 2015-2022.csv?raw'
+
+// import testCsvText from './assets/Testing Data 1999.csv?raw'
+// import testCsvText from './assets/Testing Data 2014.csv?raw'
 import testCsvText from './assets/Testing Data 2023.csv?raw'
 
 import networkFile from './assets/network.json'
+// import networkFile from './assets/network(20 balanced and raw sets).json'
+// import networkFile from './assets/network(20 balanced sets).json'
+// import networkFile from './assets/network (20 balanced and raw sets he init).json'
 
 
 import { useState } from "react"
@@ -148,7 +153,7 @@ export default function SportsBetNN(){
       function predict() {
         const inputs = buildInputVector(homeTeam, awayTeam, stats)
         // Deep clone network so feedforward doesn't mutate the imported object permanently
-        const network = JSON.parse(JSON.stringify(networkData))
+        // const network = JSON.parse(JSON.stringify(networkData))
         const output = feedforward(network, inputs)
         setResult(output)
       }
@@ -158,7 +163,7 @@ export default function SportsBetNN(){
       const winner = result !== null ? (result >= 0.5 ? homeTeam : awayTeam) : null
 
 
-    // const trainingData = loadCSV(csvText)
+    const trainingData = loadCSV(csvText)
     const testData = loadCSV(testCsvText)
 
     
@@ -169,10 +174,21 @@ export default function SportsBetNN(){
         return (Math.random() * 2) - 1 
     }
 
+    function heWeight(fanIn) {
+    // Box-Muller transform — converts two uniform random numbers into
+    // a standard normal distribution (bell curve centered at 0)
+    const u1 = Math.random();
+    const u2 = Math.random();
+    const gaussian = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    
+    // Scale by He factor
+    return gaussian * Math.sqrt(2 / fanIn);
+}
+
     //Create 2d array with each slot containing a random weight
     function makeMatrix(rows, cols) {
         return Array.from({ length: rows }, () =>
-            Array.from({ length: cols }, () => randomWeight())
+            Array.from({ length: cols }, () => heWeight(cols))
         )
     }
 
@@ -212,29 +228,26 @@ export default function SportsBetNN(){
     //     ]
     // }
 
-    // const network = {
-    //     layers: [
-    //         new Array(101).fill(0),  // input layer
-    //         // new Array(128).fill(0),  // hidden layer 1
-    //         new Array(64).fill(0),  // hidden layer 1
-    //         new Array(32).fill(0),  // hidden layer 2
-    //         new Array(1).fill(0),   // output layer
-    //     ],
-    //     weights: [
-    //         makeMatrix(101, 64),  // input → hidden 1
-    //         // makeMatrix(128, 64),  // hidden 1 → hidden 2
-    //         makeMatrix(64, 32),  // hidden 1 → hidden 2
-    //         makeMatrix(32, 1),   // hidden 2 → output
-    //     ],
-    //     biases: [
-    //         // makeBiases(128),  // hidden layer 1
-    //         makeBiases(64),  // hidden layer 1
-    //         makeBiases(32),  // hidden layer 2
-    //         makeBiases(1),   // output layer
-    //     ]
-    // }
+    const network = {
+        layers: [
+            new Array(101).fill(0),  // input layer
+            new Array(64).fill(0),  // hidden layer 1
+            new Array(32).fill(0),  // hidden layer 2
+            new Array(1).fill(0),   // output layer
+        ],
+        weights: [
+            makeMatrix(101, 64),  // input → hidden 1
+            makeMatrix(64, 32),  // hidden 1 → hidden 2
+            makeMatrix(32, 1),   // hidden 2 → output
+        ],
+        biases: [
+            makeBiases(64),  // hidden layer 1
+            makeBiases(32),  // hidden layer 2
+            makeBiases(1),   // output layer
+        ]
+    }
 
-    const network = networkFile;
+    // const network = networkFile;
 
     function getNetworkOutput(network) {
         return (network.layers[network.layers.length - 1][0]);
@@ -476,70 +489,61 @@ export default function SportsBetNN(){
 
 
 
-   function train(network, trainingData, learningRate, epochNumber) {
-        const shuffled = [...trainingData].sort(() => Math.random() - 0.5)
+  function train(network, trainingData, learningRate, epochNumber) {
+    const shuffled = [...trainingData].sort(() => Math.random() - 0.5);
 
-        const batches = []
-        for (let i = 0; i < shuffled.length; i += 32) {
-            batches.push(shuffled.slice(i, i + 32))
-        }
+    const batches = [];
+    for (let i = 0; i < shuffled.length; i += 32) {
+        batches.push(shuffled.slice(i, i + 32));
+    }
 
-        let epochCost = 0  // ← add this
+    let epochCost = 0;
+    let winRate = 0;
 
-        let winRate = 0
+    for (let batch of batches) {
+        let totalWeightDeltas = network.weights.map(matrix =>
+            matrix.map(row => row.map(() => 0))
+        );
+        let totalBiasDeltas = network.biases.map(arr => arr.map(() => 0));
+        let batchCost = 0;
 
-        for (let batch of batches) {
-            let totalWeightDeltas = network.weights.map(matrix =>
-                matrix.map(row => row.map(() => 0))
-            )
-            let totalBiasDeltas = network.biases.map(arr => arr.map(() => 0))
-            let batchCost = 0
-            
+        for (let game of batch) {
+            feedforward(network, game.inputs);
+            const output = getNetworkOutput(network);
 
-            for (let game of batch) {
-                feedforward(network, game.inputs)
-                batchCost += cost(getNetworkOutput(network), game.expected)
-                 
-                winRate += Math.round(getNetworkOutput(network)) == game.expected 
-                
+            batchCost += cost(output, game.expected);
+            winRate += Math.round(output) === game.expected ? 1 : 0;
 
+            const [wDeltas, bDeltas] = getDeltas(network, game.expected);
 
-
-
-
-                const [wDeltas, bDeltas] = getDeltas(network, game.expected)
-
-                for (let l = 0; l < totalWeightDeltas.length; l++) {
-                    for (let i = 0; i < totalWeightDeltas[l].length; i++)
-                        for (let j = 0; j < totalWeightDeltas[l][i].length; j++)
-                            totalWeightDeltas[l][i][j] += wDeltas[l][i][j]
-                    for (let j = 0; j < totalBiasDeltas[l].length; j++)
-                        totalBiasDeltas[l][j] += bDeltas[l][j]
-                }
-
-            const batchSize = batch.length
             for (let l = 0; l < totalWeightDeltas.length; l++) {
                 for (let i = 0; i < totalWeightDeltas[l].length; i++)
                     for (let j = 0; j < totalWeightDeltas[l][i].length; j++)
-                        totalWeightDeltas[l][i][j] /= batchSize
+                        totalWeightDeltas[l][i][j] += wDeltas[l][i][j];
                 for (let j = 0; j < totalBiasDeltas[l].length; j++)
-                    totalBiasDeltas[l][j] /= batchSize
+                    totalBiasDeltas[l][j] += bDeltas[l][j];
             }
+        } // ← game loop ends here (was the bug)
 
-            gradientDescent(network, totalWeightDeltas, totalBiasDeltas, learningRate)
-            epochCost += batchCost / batchSize 
-            }
-
+        const batchSize = batch.length;
+        for (let l = 0; l < totalWeightDeltas.length; l++) {
+            for (let i = 0; i < totalWeightDeltas[l].length; i++)
+                for (let j = 0; j < totalWeightDeltas[l][i].length; j++)
+                    totalWeightDeltas[l][i][j] /= batchSize;
+            for (let j = 0; j < totalBiasDeltas[l].length; j++)
+                totalBiasDeltas[l][j] /= batchSize;
         }
 
-        winRate /= shuffled.length;
-        console.log(" win rate: " + winRate);
-
-        const avgCost = epochCost / batches.length  // ← add this
-        console.log(`Epoch ${epochNumber} — avg cost: ${avgCost.toFixed(4)}`)
-        return avgCost  // ← add this
-
+        gradientDescent(network, totalWeightDeltas, totalBiasDeltas, learningRate);
+        epochCost += batchCost / batchSize;
     }
+
+    winRate /= shuffled.length;
+    const avgCost = epochCost / batches.length;
+
+    console.log(`Epoch ${epochNumber} — avg cost: ${avgCost.toFixed(4)}, win rate: ${(winRate * 100).toFixed(1)}%`);
+    return avgCost;
+}
 
 
 
@@ -647,6 +651,9 @@ export default function SportsBetNN(){
     
                 <div className='projectTitle'>
                     <h1>Project Title</h1>
+                </div>
+                <div>
+                  <NeuralNetworkViz network={network} />
                 </div>
                 <div className='projectBody'>
 
@@ -801,8 +808,8 @@ export default function SportsBetNN(){
                 </div>
 
 
-                {/* <button onClick={() => runEpochs(network, balanceData(trainingData), 0.02, 20)}>Train Balanced Data</button> */}
-                {/* <button onClick={() => runEpochs(network, trainingData, 0.02, 20)}>Train Raw Data</button> */}
+                <button onClick={() => runEpochs(network, balanceData(trainingData), 0.02, 50)}>Train Balanced Data</button>
+                <button onClick={() => runEpochs(network, trainingData, 0.02, 50)}>Train Raw Data</button>
 
                 <button onClick={() => testNetwork(network, testData)}>Test</button>
 
