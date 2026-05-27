@@ -24,9 +24,9 @@ const getWeight = (weights, li, fromIdx, toIdx) => {
 };
 
 const getBias = (biases, li, ni) => {
-  const lb = biases?.[li];
-  if (!lb) return 0;
-  return Array.isArray(lb) ? (lb[ni] ?? 0) : 0;
+    const lb = biases?.[li - 1];  // offset by 1 to skip input layer
+    if (!lb) return 0;
+    return Array.isArray(lb) ? (lb[ni] ?? 0) : 0;
 };
 
 export default function NeuralNetworkViz({ network }) {

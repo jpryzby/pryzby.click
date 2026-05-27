@@ -1,24 +1,29 @@
 import './sportsBetNNStyle.css'
 import NeuralNetworkViz from "./NNVizualizer";
+import TableOfContents from '../../components/tableOfContents/tableOfContents.jsx';
+
 
 // import csvText from './assets/Training Data 2000-2023.csv?raw'
 // import csvText from './assets/Training Data 2015-2023.csv?raw'
-import csvText from './assets/Training Data 2000-2022.csv?raw'
+// import csvText from './assets/Training Data 2000-2022.csv?raw'
 // import csvText from './assets/Training Data 2015-2022.csv?raw'
+import csvText from './assets/games_2000_to_2022 (2).csv?raw'
 
 // import testCsvText from './assets/Testing Data 1999.csv?raw'
 // import testCsvText from './assets/Testing Data 2014.csv?raw'
-import testCsvText from './assets/Testing Data 2023.csv?raw'
+// import testCsvText from './assets/Testing Data 2023.csv?raw'
+import testCsvText from './assets/games_2023 (2).csv?raw'
 
-import networkFile from './assets/network.json'
-// import networkFile from './assets/network(20 balanced and raw sets).json'
-// import networkFile from './assets/network(20 balanced sets).json'
-// import networkFile from './assets/network (20 balanced and raw sets he init).json'
+// import networkFile from './assets/network.json'  //56.0 69 40
+// import networkFile from './assets/network(20 balanced and raw sets).json' //59.1 81 32
+// import networkFile from './assets/network(20 balanced sets).json'                        //57/8 88 19
+// import networkFile from './assets/network (20 balanced and raw sets he init).json'       //56.0 79 27
+// import networkFile from './assets/network (1).json'                                      //60.7 84 30
 
 
 import { useState } from "react"
-import scalerStats from './assets/scaler_stats.json'
-import networkData from './assets/network.json'
+import scalerStats from './assets/scaler_stats (4).json'
+// import networkData from './assets/network.json'
 
 import Nav from '../../components/nav/nav.jsx';
 import Footer from '../../components/footer/footer.jsx';
@@ -153,7 +158,7 @@ export default function SportsBetNN(){
       function predict() {
         const inputs = buildInputVector(homeTeam, awayTeam, stats)
         // Deep clone network so feedforward doesn't mutate the imported object permanently
-        // const network = JSON.parse(JSON.stringify(networkData))
+        // const network = JSON.parse(JSON.stringify(networkFile))
         const output = feedforward(network, inputs)
         setResult(output)
       }
@@ -206,46 +211,46 @@ export default function SportsBetNN(){
 
     // Weight matrices (one per layer transition)
     // Bias arrays (one per layer)
-    // const network = {
-    //     layers: [
-    //         new Array(101).fill(0),  // input layer
-    //         new Array(128).fill(0),  // hidden layer 1
-    //         new Array(64).fill(0),  // hidden layer 1
-    //         new Array(32).fill(0),  // hidden layer 2
-    //         new Array(1).fill(0),   // output layer
-    //     ],
-    //     weights: [
-    //         makeMatrix(101, 128),  // input → hidden 1
-    //         makeMatrix(128, 64),  // hidden 1 → hidden 2
-    //         makeMatrix(64, 32),  // hidden 1 → hidden 2
-    //         makeMatrix(32, 1),   // hidden 2 → output
-    //     ],
-    //     biases: [
-    //         makeBiases(128),  // hidden layer 1
-    //         makeBiases(64),  // hidden layer 1
-    //         makeBiases(32),  // hidden layer 2
-    //         makeBiases(1),   // output layer
-    //     ]
-    // }
-
     const network = {
         layers: [
             new Array(101).fill(0),  // input layer
+            new Array(128).fill(0),  // hidden layer 1
             new Array(64).fill(0),  // hidden layer 1
             new Array(32).fill(0),  // hidden layer 2
             new Array(1).fill(0),   // output layer
         ],
         weights: [
-            makeMatrix(101, 64),  // input → hidden 1
+            makeMatrix(101, 128),  // input → hidden 1
+            makeMatrix(128, 64),  // hidden 1 → hidden 2
             makeMatrix(64, 32),  // hidden 1 → hidden 2
             makeMatrix(32, 1),   // hidden 2 → output
         ],
         biases: [
+            makeBiases(128),  // hidden layer 1
             makeBiases(64),  // hidden layer 1
             makeBiases(32),  // hidden layer 2
             makeBiases(1),   // output layer
         ]
     }
+
+    // const network = {
+    //     layers: [
+    //         new Array(101).fill(0),  // input layer
+    //         new Array(64).fill(0),  // hidden layer 1
+    //         new Array(32).fill(0),  // hidden layer 2
+    //         new Array(1).fill(0),   // output layer
+    //     ],
+    //     weights: [
+    //         makeMatrix(101, 64),  // input → hidden 1
+    //         makeMatrix(64, 32),  // hidden 1 → hidden 2
+    //         makeMatrix(32, 1),   // hidden 2 → output
+    //     ],
+    //     biases: [
+    //         makeBiases(64),  // hidden layer 1
+    //         makeBiases(32),  // hidden layer 2
+    //         makeBiases(1),   // output layer
+    //     ]
+    // }
 
     // const network = networkFile;
 
@@ -650,12 +655,15 @@ export default function SportsBetNN(){
                 <Nav />
     
                 <div className='projectTitle'>
-                    <h1>Project Title</h1>
+                    <h1>NBA Neural Network</h1>
+                </div>
+                <div>
+                  <TableOfContents />
                 </div>
                 <div>
                   <NeuralNetworkViz network={network} />
                 </div>
-                <div className='projectBody'>
+                <div id='project-body' className='projectBody'>
 
 
 
@@ -808,8 +816,8 @@ export default function SportsBetNN(){
                 </div>
 
 
-                <button onClick={() => runEpochs(network, balanceData(trainingData), 0.02, 50)}>Train Balanced Data</button>
-                <button onClick={() => runEpochs(network, trainingData, 0.02, 50)}>Train Raw Data</button>
+                <button onClick={() => runEpochs(network, balanceData(trainingData), 0.005, 20)}>Train Balanced Data</button>
+                <button onClick={() => runEpochs(network, trainingData, 0.005, 20)}>Train Raw Data</button>
 
                 <button onClick={() => testNetwork(network, testData)}>Test</button>
 
@@ -819,19 +827,34 @@ export default function SportsBetNN(){
 
 
 
-                <div className='projectDescription'>
+                <div id="project-description" className='projectDescription'>
                     <h2>Project Description</h2>
                     <div className='projectParagraph'>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod earum beatae, deleniti quae eveniet reiciendis id incidunt blanditiis repellat harum quidem magnam adipisci minima, nihil officia voluptatem, cumque facilis quis.</p>
-                        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Assumenda cumque officiis modi, consequuntur saepe eveniet! Mollitia nam, quae autem eius deserunt similique omnis maiores aperiam ullam blanditiis expedita quod necessitatibus!</p>
+                        <p>This program is a feedforward neural network, trained on NBA game data ranging from 2000 to 2023. Its purpose is to take in gameday data and predict the winner of a game. It predicts the correct winner roughly ___________% of the time.</p>
+                        <p>The network makes its predictions by looking at each teams recent game history. It takes in stats like the average number of fouls, the average free-throw hit rate, and the average number of successful blocks, and much more, from their previous 10 games. It also looks at the recent win/loss history from the last few times these teams played each other. This data then feeds through a neural network, outputting a single number value between 0 and 1. if that value is above 0.5, we interpret that as a home team win. If the number is below 0.5, we interpret that as an away team win.</p>
+                        <p>What is the structure of the neural network? The network is composed of several "layers" of neurons, connected by weighted connections. Each neuron is simply a value between -1 and 1, representing how "activated" the neuron is. So if the home-team-free-throw neuron has a value of 0.9, that means that the home team has been very good with free throws recently. Each layer is an array of neurons, where each neuron in a previous layer feeds into EVERY neuron of the next layer. Each connection has a "weight" which determines how important a signal is. So if a neuron has a high activation, but a very low weight, the result is that the activation will be largely ignored. Vice Versa, a highly activated neuron with a high weight, will have a large impact on the output.</p>
+                        <p>Why the layered architecture? The hope is that each layer picks up on smaller abstractions. So for example, the first layer may pick up on correlations between number-of-successful-blocks, a low number-of-fouls, and a low successful-free-throw from the opposite team, and interpret that as playing a good defensive game. The next layer may pick up on a good defensive game, and the opposing teams weak offensive game as good odds of a home team win. The last layer may see that the last few times these teams played, it didn't go well for the home team, so it will temper its expectations. In reality, these layers are much more abstract, and less human understandable, but the theory is that a deeper network can pick up on more abstract patterns than a shallower network. </p>
+                        <p>How does the network "learn"? The network is trained on game data ranging from 2000 to 2023. Initially, the network is initialized with random values. The network is then fed a batch of games, and asked to make predictions. It will keep track of how wrong its predictions are, and adjust a corresponding amount. So if the network is mostly accurate, it will make a small adjustment, and if it is very wrong it will make a larger adjustment. </p>
+                        <p>The network will start at the output and increase or decrease its weights and biases depending on its success rate. It then goes back to the previous layer and makes the same adjustments. How does it know how much to tweak each previous input? If the input was highly activated, then it highly contributed to the incorrect guess, and must be sharply adjusted. If the neuron was weakly activated, then it did NOT contribute much to the incorrect guess, so it does not need to be as sharply adjusted. </p>
                     </div>
                 </div>
-                <div className='projectInstructions'>
+                <div id="how-to-use" className='projectInstructions'>
                     <h2>How To Use</h2>
                     <div className='projectParagraph'>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod earum beatae, deleniti quae eveniet reiciendis id incidunt blanditiis repellat harum quidem magnam adipisci minima, nihil officia voluptatem, cumque facilis quis.</p>
-                        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Assumenda cumque officiis modi, consequuntur saepe eveniet! Mollitia nam, quae autem eius deserunt similique omnis maiores aperiam ullam blanditiis expedita quod necessitatibus!</p>
+                        <p>Select which team is playing home and away.</p>
+                        <p>For each stat input, put in the AVERAGE value from the last 10 games this team has played. </p>
+                        {/* <p>**Add in autofill example games?**</p> */}
                     </div>
+                </div>
+                
+                <div id="improvements" className="projectImprovements">
+                  <h2>What can still be improved?</h2>
+                  <div className='projectParagraph'>
+                    <p>1) Current model does not use any player or injury data. A game with a fully injured team and a fully healthy team are evaluated evenly.</p>
+                    <p>2) Data set stops at 2023, so as teams change over time, the model will get less accurate.</p>
+                    <p>3) Running this network on a live game takes a LOT of research. It would be nice to include some web crawlers to autofill some statistics.</p>
+                    <p>4) For demoing, it would be nice if we could auto fill in game data from 10 or so games, just so the user can test the bot without 30 minutes of research.</p>
+                  </div>
                 </div>
             </div>
         )
