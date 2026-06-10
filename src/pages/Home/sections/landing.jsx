@@ -19,10 +19,6 @@ let numberOfparticles = Math.max(100,(window.innerHeight * window.innerWidth) / 
 const particleVelocity = 0.2; 
 
 
-console.log("mouseInfluenceRange: " + mouseInfluenceRange);
-console.log("connectionLength: " + connectionLength);
-console.log("numberOfparticles: " + numberOfparticles);
-
 
 
 

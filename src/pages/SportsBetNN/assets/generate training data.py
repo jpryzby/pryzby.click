@@ -1,0 +1,221 @@
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import numpy as np
+import json
+
+
+
+
+# Load your data
+df = pd.read_csv('game.csv')
+
+# Make sure games are in chronological order
+df = df.sort_values('game_date')
+
+
+
+
+stats = {
+    # Away stats
+    'Away Team Field Goals Made':              'team_id_away',
+    'Away Team Field Goals Attempted':         'team_id_away',
+    'Away Team Field Goal Percentage':         'team_id_away',
+    'Away Team 3-Point Field Goals Made':      'team_id_away',
+    'Away Team 3-Point Field Goals Attempted': 'team_id_away',
+    'Away Team 3-Point Percentage':            'team_id_away',
+    'Away Team Free Throws Made':              'team_id_away',
+    'Away Team Free Throws Attempted':         'team_id_away',
+    'Away Team Free Throw Percentage':         'team_id_away',
+    'Away Team Offensive Rebounds':            'team_id_away',
+    'Away Team Defensive Rebounds':            'team_id_away',
+    'Away Team Total Rebounds':                'team_id_away',
+    'Away Team Assists':                       'team_id_away',
+    'Away Team Steals':                        'team_id_away',
+    'Away Team Blocks':                        'team_id_away',
+    'Away Team Turnovers':                     'team_id_away',
+    'Away Team Personal Fouls':                'team_id_away',
+    'Away Team Points':                        'team_id_away',
+
+    # Home stats
+    'Home Team field goals':                   'team_id_home',
+    'Home Team Field Goals Attempted':         'team_id_home',
+    'Home Team Field Goal Percentage':         'team_id_home',
+    'Home Team 3-Point Field Goals Made':      'team_id_home',
+    'Home Team 3-Point Field Goals Attempted': 'team_id_home',
+    'Home Team 3-Point Percentage':            'team_id_home',
+    'Home Team Free Throws Made':              'team_id_home',
+    'Home Team Free Throws Attempted':         'team_id_home',
+    'Home Team Free Throw Percentage':         'team_id_home',
+    'Home Team Offensive Rebounds':            'team_id_home',
+    'Home Team Defensive Rebounds':            'team_id_home',
+    'Home Team Total Rebounds':                'team_id_home',
+    'Home Team Assists':                       'team_id_home',
+    'Home Team Steals':                        'team_id_home',
+    'Home Team Blocks':                        'team_id_home',
+    'Home Team Turnovers':                     'team_id_home',
+    'Home Team Personal Fouls':                'team_id_home',
+    'Home Team Points':                        'team_id_home',
+}
+
+for col, team_col in stats.items():
+    df[f'10 Game Rolling Average {col}'] = (
+        df.groupby(team_col)[col]
+        .transform(lambda x: x.shift(1).rolling(10, min_periods=3).mean())
+    )
+
+
+
+
+# Convert W/L to 1/0
+df['wl_home'] = df['wl_home'].replace({'W': 1, 'L': 0})
+
+
+
+
+# Create win/loss history
+
+# Create a canonical matchup key (alphabetical order so A-vs-B == B-vs-A)
+df['matchup_key'] = df.apply(
+    lambda r: '_vs_'.join(sorted([r['team_name_home'], r['team_name_away']])), axis=1
+)
+
+# For each row, figure out if the "first alphabetical team" won
+# so we have a consistent win indicator across home/away flips
+df['first_team'] = df['matchup_key'].str.split('_vs_').str[0]
+df['first_team_won'] = (
+    (df['team_name_home'] == df['first_team']) & (df['wl_home'] == 1) |
+    (df['team_name_away'] == df['first_team']) & (df['wl_home'] == 0)
+).astype(int)
+
+# Rolling win ratio over last 10 matchups (excluding current game)
+def rolling_matchup_ratio(group):
+    shifted = group['first_team_won'].shift(1)  # exclude current game
+    ratio = shifted.rolling(window=10, min_periods=10).mean()
+    return ratio
+
+df['h2h_win_ratio_last10'] = (
+    df.groupby('matchup_key', group_keys=False)
+      .apply(rolling_matchup_ratio)
+)
+
+
+
+rolling_cols = [c for c in df.columns if '10 Game Rolling' in c]
+
+scaler = StandardScaler()
+df[rolling_cols] = scaler.fit_transform(df[rolling_cols])
+
+# now save the stats
+scaler_stats = {
+    'mean': dict(zip(rolling_cols, scaler.mean_.tolist())),
+    'std': dict(zip(rolling_cols, scaler.scale_.tolist()))
+}
+
+with open('scaler_stats.json', 'w') as f:
+    json.dump(scaler_stats, f)
+
+
+
+#drop everything we dont need
+
+#drop all star teams and teams that dont exist in 2023
+df = df[~df['team_name_home'].str.contains('All Star', na=False)]
+df = df[~df['team_name_away'].str.contains('All Star', na=False)]
+
+#consolodate same team under different names
+df['team_name_home'] = df['team_name_home'].replace({
+    'LA Clippers': 'Los Angeles Clippers',
+    'New Jersey Nets': 'Brooklyn Nets',
+    'New Orleans Hornets': 'Charlotte Hornets',
+    'Vancouver Grizzlies': 'Memphis Grizzlies',
+})
+df['team_name_away'] = df['team_name_away'].replace({
+    'LA Clippers': 'Los Angeles Clippers',
+    'New Jersey Nets': 'Brooklyn Nets',
+    'New Orleans Hornets': 'Charlotte Hornets',
+    'Vancouver Grizzlies': 'Memphis Grizzlies',
+})
+
+df['game_date'] = pd.to_datetime(df['game_date'])
+df = df[df['game_date'].dt.year >= 1998].reset_index(drop=True)
+
+valid_teams = {
+    'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets',
+    'Chicago Bulls', 'Cleveland Cavaliers', 'Dallas Mavericks', 'Denver Nuggets',
+    'Detroit Pistons', 'Golden State Warriors', 'Houston Rockets', 'Indiana Pacers',
+    'Los Angeles Clippers', 'Los Angeles Lakers', 'Memphis Grizzlies', 'Miami Heat',
+    'Milwaukee Bucks', 'Minnesota Timberwolves', 'New Orleans Pelicans', 'New York Knicks',
+    'Oklahoma City Thunder', 'Orlando Magic', 'Philadelphia 76ers', 'Phoenix Suns',
+    'Portland Trail Blazers', 'Sacramento Kings', 'San Antonio Spurs', 'Toronto Raptors',
+    'Utah Jazz', 'Washington Wizards',
+    # pre-2013 names that are now consolidated
+    'Seattle SuperSonics', 'New Jersey Nets', 'New Orleans Hornets',
+    'Charlotte Bobcats', 'LA Clippers', 'Vancouver Grizzlies'
+}
+
+# Filter to only valid NBA teams BEFORE get_dummies
+df = df[df['team_name_home'].isin(valid_teams)]
+df = df[df['team_name_away'].isin(valid_teams)]
+
+home_dummies = pd.get_dummies(df['team_name_home'], prefix='home', dtype=int)
+away_dummies = pd.get_dummies(df['team_name_away'], prefix='away', dtype=int)
+df = pd.concat([df, home_dummies, away_dummies], axis=1)
+
+
+# Drop all NAN rows
+df = df.dropna()
+
+#Drop everything before the year 2015
+df['game_date'] = pd.to_datetime(df['game_date'])
+# df = df[df['game_date'].dt.year <= 2000].reset_index(drop=True)
+# df = df[df['game_date'].dt.year >= 1999].reset_index(drop=True)
+
+
+
+
+
+
+
+
+
+cols_to_drop = [
+    'team_abbreviation_home','team_name_home', 'matchup_home',
+    'team_abbreviation_away', 'team_name_away', 'matchup_away', 'Away Team Win/Loss Result',
+    'matchup_key', 'first_team', 'first_team_won', 'season_id', 'team_id_home', 'game_id', 'min',
+    'Home Team field goals', 'Home Team Field Goals Attempted', 'Home Team Field Goal Percentage',
+    'Home Team 3-Point Field Goals Made', 'Home Team 3-Point Field Goals Attempted', 'Home Team 3-Point Percentage',
+    'Home Team Free Throws Made', 'Home Team Free Throws Attempted', 'Home Team Free Throw Percentage',
+    'Home Team Offensive Rebounds', 'Home Team Defensive Rebounds', 'Home Team Total Rebounds',
+    'Home Team Assists', 'Home Team Steals', 'Home Team Blocks', 'Home Team Turnovers',
+    'Home Team Personal Fouls', 'Home Team Points', 'Home Team Point Differential',
+    'video_available_home', 'team_id_away',
+    'Away Team Field Goals Made', 'Away Team Field Goals Attempted', 'Away Team Field Goal Percentage',
+    'Away Team 3-Point Field Goals Made', 'Away Team 3-Point Field Goals Attempted', 'Away Team 3-Point Percentage',
+    'Away Team Free Throws Made', 'Away Team Free Throws Attempted', 'Away Team Free Throw Percentage',
+    'Away Team Offensive Rebounds', 'Away Team Defensive Rebounds', 'Away Team Total Rebounds',
+    'Away Team Assists', 'Away Team Steals', 'Away Team Blocks', 'Away Team Turnovers',
+    'Away Team Personal Fouls', 'Away Team Points', 'Away Team Point Differential',
+    'video_available_away', 'season_type'
+]
+
+# ── Drop columns (game_date stays for slicing) ──
+df = df.drop(columns=[c for c in cols_to_drop if c in df.columns])
+
+# ── Slice by year ──
+df_1999         = df[df['game_date'].dt.year == 1999]
+df_2023         = df[df['game_date'].dt.year == 2023]
+df_2000_on      = df[df['game_date'].dt.year >= 2000]
+df_2000_to_2022 = df[(df['game_date'].dt.year >= 2000) & (df['game_date'].dt.year <= 2022)]
+
+# ── Drop game_date from each slice ──
+df_1999         = df_1999.drop(columns=['game_date'])
+df_2023         = df_2023.drop(columns=['game_date'])
+df_2000_on      = df_2000_on.drop(columns=['game_date'])
+df_2000_to_2022 = df_2000_to_2022.drop(columns=['game_date'])
+
+# ── Export ──
+df_1999.to_csv('games_1999.csv', index=False)
+df_2023.to_csv('games_2023.csv', index=False)
+df_2000_on.to_csv('games_2000_to_2023.csv', index=False)
+df_2000_to_2022.to_csv('games_2000_to_2022.csv', index=False)
+

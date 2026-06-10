@@ -18,11 +18,11 @@ export default function About(){
                     </p>
                     <br />
                     <p>
-                        My name is Jon, and I am a full stack developer. I earned my degree at Central Connecticut State University, with honors (?) and having earned the Bryan Something-or-other award for _________. I am capable of both front and back end development, but back end is where my real passion is. 
+                        My name is Jon, and I am a full stack developer. I earned my degree at Central Connecticut State University, having earned the Bryan Something-or-other award for _________. I am capable of both front and back end development, but back end is where my real passion is. 
                     </p>
                     <br />
                     <p>
-                        I hope that this site can show off some of my capabilities. It shows react web development, complex data manipulation, API calls, Cloud Hosting, and more. 
+                        I hope that this site can highlight my technical capabilities. It shows React web development, complex JavaScript backend systems, advanced data processing, Cloud Hosting, and more. 
                     </p>
                 </div>
                 
