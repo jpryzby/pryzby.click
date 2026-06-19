@@ -33,10 +33,10 @@ export default function NeuralNetworkViz({ network }) {
   const canvasRef = useRef(null);
   const { layers = [], weights = [], biases = [] } = network || {};
 
-  const NODE_R = 4;
+  const NODE_R = 3;
   const PAD_X = 50;
   const PAD_Y = 40;
-  const MIN_NODE_GAP = 2;
+  const MIN_NODE_GAP = 1;
 
   const wrapRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(800);
@@ -139,25 +139,25 @@ export default function NeuralNetworkViz({ network }) {
     for (let li = 0; li < layers.length; li++) {
       const x = PAD_X + li * LAYER_GAP;
       const label = li === 0 ? "INPUT" : li === layers.length - 1 ? "OUTPUT" : `HIDDEN ${li}`;
-      ctx.fillStyle = "#555";
+      ctx.fillStyle = "#eee";
       ctx.fillText(label, x, canvasHeight - 16);
-      ctx.fillStyle = "#333";
+      ctx.fillStyle = "#eee";
       ctx.fillText(`${layerCounts[li]} nodes`, x, canvasHeight - 4);
     }
   }, [nodeCenters, layers, weights, biases, canvasWidth, canvasHeight, layerCounts]);
 
   if (!layers || layers.length < 2) {
     return (
-      <div style={styles.wrapper}>
+      // <div style={styles.wrapper}>
         <div style={{ ...styles.card, color: "#444", fontSize: "11px", letterSpacing: "2px" }}>
           NO NETWORK DATA
         </div>
-      </div>
+      // </div>
     );
   }
 
   return (
-    <div style={styles.wrapper}>
+    // <div style={styles.wrapper}>
       <div style={styles.card}>
         <div style={styles.header}>
           <span style={styles.label}>NETWORK</span>
@@ -191,26 +191,19 @@ export default function NeuralNetworkViz({ network }) {
           </div>
         </div>
       </div>
-    </div>
+    // </div>
   );
 }
 
 const styles = {
-  wrapper: {
-    background: "#0d0d0d",
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "'JetBrains Mono', monospace",
-    padding: "24px",
-  },
   card: {
     background: "#111",
     border: "1px solid #222",
     borderRadius: "4px",
     padding: "28px",
-    width: "100%",
+    margin: "20px",
+    width: "90%",
+    maxHeight: "90%"
   },
   header: {
     marginBottom: "20px",
@@ -220,20 +213,20 @@ const styles = {
     alignItems: "baseline",
     gap: "16px",
   },
-  label: { color: "#333", fontSize: "9px", letterSpacing: "3px" },
+  label: { color: "#eee", fontSize: "9px", letterSpacing: "3px" },
   title: {
     color: "#eee", fontSize: "15px", fontWeight: "400",
     margin: 0, letterSpacing: "2px", textTransform: "uppercase", flex: 1,
   },
   legend: { display: "flex", alignItems: "center", gap: "6px" },
   dot: { width: "8px", height: "8px", borderRadius: "50%", display: "inline-block" },
-  legendText: { color: "#444", fontSize: "9px", marginRight: "6px" },
+  legendText: { color: "#eee", fontSize: "9px", marginRight: "6px" },
   canvasWrap: { background: "#0d0d0d", borderRadius: "2px", overflowX: "auto" },
   stats: {
     display: "flex", gap: "20px", marginTop: "16px",
     paddingTop: "14px", borderTop: "1px solid #1a1a1a",
   },
   stat: { textAlign: "center" },
-  statVal: { color: "#888", fontSize: "14px" },
-  statKey: { color: "#333", fontSize: "8px", letterSpacing: "2px", marginTop: "2px" },
+  statVal: { color: "#eee", fontSize: "14px" },
+  statKey: { color: "#eee", fontSize: "8px", letterSpacing: "2px", marginTop: "2px" },
 };

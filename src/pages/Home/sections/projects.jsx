@@ -17,36 +17,31 @@ export default function Projects(){
             </div>
 
             <Link to="/sportsBetNN" className="projectContainer">
-                <div className='projectText'>
-                    <div className='projectTitle'>
-                        <h2>Sports Betting Neural Network</h2>
-                    </div>
+                <div className='projectTitle'>
+                    <h2>Sports Betting Neural Network</h2>
+                </div>
+                <div className='projectCard'>
                     <div className='projectDescription'>
                         <p>
-                            This is a neural network that was trained on Major League Baseball data sets. It uses parameters like _______, ________, and ________, to predict the winner of games.    
+                            This is a feedforward neural network that was trained on NBA Basketball data sets. It's purpose is to predict the winner of games.    
                         </p>
                         <br />
                         <p>
-                            It works by ____ ____ __ _ _ _____ ______ _____ ___ ________ __ _____ ____ ___ ______ ___ _ _ _____ ____ ___ _____ _____ __ _ _____ ____ ____ __ __ _____ _____. In my testing, it has predicted the correct winner __% of the time.
+                            The network makes its predictions by looking at each teams recent game history. It takes in stats like the average number of fouls, the average free-throw hit rate, the average number of successful blocks, and much more, from their previous 10 games. It also looks at the recent win/loss history from the last few times these teams played each other. This data then feeds through a neural network, outputting a single number value between 0 and 1, which we interpret as a home team win or loss. It predicts the correct winner roughly 62% of the time.
                         </p>
                     </div>
-                </div>
-                
-                <div className='projectImg'>
-                    <img src={neuralNetImg} alt="Description" />
+                    <div className='projectImg'>
+                        <img src={neuralNetImg} alt="Description" />
+                    </div>
                 </div>
             </Link>
             
 
-            <Link to="/steganography" className="projectContainer">               
-                <div className='projectImg'>
-                    <img src={steganographyImg} alt="Description" />
+            <Link to="/steganography" className="projectContainer">
+                <div className='projectTitle'>
+                    <h2>Image Steganography Encoder/Decoder</h2>
                 </div>
-
-                <div className='projectText'>
-                    <div className='projectTitle'>
-                        <h2>Image Steganography Encoder/Decoder</h2>
-                    </div>
+                <div className='projectCard'>
                     <div className='projectDescription'>
                         <p>
                             This is a tool that "hides" a block of text within an image, such that it can be later retreived. It works by converting the text to an array of bits, then "distributing" those bits to the color values of each pixel. The result is that the image is subtley altered, in such a way that is not noticable to the human eye, but is noticable when directly comparing color values.
@@ -57,18 +52,20 @@ export default function Projects(){
                         </p>
                         <br />
                         <p>
-                            This tool can hide ________ characters in a 2000x2000 image with a bit depth of ______, without noticably altering the image. Thats the entire Harry Potter book series. Twice!
+                            This tool can hide 3,750,000 characters in a 2500x2000 image with a bit depth of 4, without noticably altering the image. Thats the entire 1st book of "Game of Thrones". Twice!
                         </p>
                     </div>
+                    <div className='projectImg'>
+                        <img src={steganographyImg} alt="Description" />
+                    </div>
                 </div>
-                
             </Link>
 
-            <Link to="/runescapeBot" className="projectContainer">               
-                <div className='projectText'>
-                    <div className='projectTitle'>
-                        <h2>Runescape Bot</h2>
-                    </div>
+            <div className="projectContainer projectContainerDisabled">
+                <div className='projectTitle'>
+                    <h2>Runescape Bot</h2>
+                </div>
+                <div className='projectCard'>
                     <div className='projectDescription'>
                         <p>
                             Currently under construction!
@@ -82,13 +79,12 @@ export default function Projects(){
                             What still needs to be done? I plan to host a server on AWS, and have it run 24/7. When the user "tunes in", they can see what the bot is up to at that current moment. Perhaps we make it pick a new random task every 30 minutes.
                         </p>
                     </div>
+                    <div className='projectImg'>
+                        <img src={runescapeImg} alt="A profile picture of a nice young man" />
+                    </div>
                 </div>
-                
-            
-                <div className='projectImg'>
-                    <img src={runescapeImg} alt="A profile picture of a nice young man" />
-                </div>
-            </Link>
+                <div className='underConstructionBanner'>UNDER CONSTRUCTION</div>
+            </div>
         </div>
     )
 }

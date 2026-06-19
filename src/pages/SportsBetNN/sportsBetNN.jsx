@@ -186,13 +186,12 @@ export default function SportsBetNN(){
                 <div>
                   <TableOfContents />
                 </div>
+                
+                <div id='project-body' className='projectBody'>
+                  <GamePredictor />
+                </div>
                 <div>
                   <NeuralNetworkViz network={network} />
-                </div>
-                <div id='project-body' className='projectBody'>
-
-                  <GamePredictor />
-
                 </div>
 
                 <NetworkTrainer />

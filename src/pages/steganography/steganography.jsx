@@ -2,6 +2,8 @@ import './steganographyStyle.css';
 import Nav from '../../components/nav/nav.jsx';
 import TableOfContents from '../../components/tableOfContents/tableOfContents.jsx';
 import { useState, useRef } from "react";
+import sampleImage from './book 2500x2000.png';
+import sampleText from './Game of Thrones (Books 1).txt';
 
 export default function Steganography() {
 
@@ -144,6 +146,8 @@ export default function Steganography() {
             const totalPixels = canvas.width * canvas.height;
             const pixelsNeeded = Math.ceil(totalBits / (3 * bitDepth));
             const imagePayload = totalPixels * bitDepth * 3 / 16;
+            console.log("imagePayload: " + imagePayload);
+
 
 
             //if too much text, abort
@@ -494,7 +498,7 @@ export default function Steganography() {
                     <p>This tool is an image steganography encoder and decoder. The encoder is capable of taking large volumns of text and 'hiding' them in an image. It does this by subtly tweaking the color value of each pixel. The decoder can then later 'extract' these slight color differences to rebuild the message. </p>
                     <p>Each pixel has a Red, Green, Blue, and Alpha value. Alpha is a measure of transparency, which browsers will often alter when images are rendered, so we will ignore this channel. That leaves us with 3 values to tweak; Red, Blue, and Green. Each of these values is an integer between 0 and 255, which can be represented as an 8 bit number. So if some pixel has the following values (Red: 11110000 Green: 00000000 Blue: 11110000) it will show as bright purple.</p>
                     <p>When we use binary to describe a color value, not all bits are created equal. As we move from left to right, the 'value' of each bit is halved. So the first bit has a value of 128, the second has a value of 64, the third has a value of 32, and so on. This means that we can alter the right-most, or "least significant" bits, without having a noticable impact on the visual appearance of the pixel. We can rewrite the last 4 bits of each color value of each pixel with our own data, and have it affect each color value by no more than 1/16th of the full range of that color.</p>
-                    <p>We can later go through this same picture and read the last 4 bits of each color value. We string these extracted bits together and interpret them as text, thus "extracting" the text we wrote in earlier. Using this method, the user can encode __________ characters into a _________px by _________px image, without visually altering it. Thats the first 5 books from "Game of Thrones"!</p>
+                    <p>We can later go through this same picture and read the last 4 bits of each color value. We string these extracted bits together and interpret them as text, thus "extracting" the text we wrote in earlier. Using this method, the user can encode 3,750,000 characters into a 2500px by 2000px image, without visually altering it. Thats the first 5 books from "Game of Thrones"!</p>
                     <p>How does the decoder know when to stop? Each image is encoded with a header that tells the decoder how long the hidden message is. This prevents the decoder from reading millions of bits of junk data after it finishes the intended message.</p>
 
                 </div>
@@ -508,6 +512,14 @@ export default function Steganography() {
                     <p>3) If you are encoding, select "Type Text" or "Upload Text". Type Text allows the user to type a message into the text box, then encode that message. Upload text allows the user to upload a larger .txt file. The text in that file will then be encoded.</p>
                     <p>4) Select an image to upload. If you are encoding, this will be the image that you are encoding text into. If you are decoding, this will be the image that you are attempting to pull text out of.</p>
                     <p>5) Hit the "GO" button. If encoding, an altered image will automatically begin downloading. If decoding, your message will be desplayed in the output text box. If no output is desplayed, double check that you are using a previously encoded image, and are using the correct "Bits per Channel" for that image.</p>
+                    <br />
+                    <p>Use these sample files!</p>
+                    <p>
+                        <a href={sampleImage} download="2500x2000 img.png" className='sampleFileLink'>Sample Image</a>
+                    </p>
+                    <p>
+                        <a href={sampleText} download="Game of Thrones book 1.txt" className='sampleFileLink'>Sample Text</a>
+                    </p>
                 </div>
             </div>
             <div id="improvements" className="projectImprovements">

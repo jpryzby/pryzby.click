@@ -20,7 +20,7 @@ p{
 }
 
 .projectBody{
-    padding: 100px;
+    /* padding: 100px; */
     height: auto;
     display: flex;
     justify-content: center;

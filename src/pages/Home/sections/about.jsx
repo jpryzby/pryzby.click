@@ -24,6 +24,10 @@ export default function About(){
                     <p>
                         I hope that this site can highlight my technical capabilities. It shows React web development, complex JavaScript backend systems, advanced data processing, Cloud Hosting, and more. 
                     </p>
+                    <br />
+                    <p>
+                        If you want to reach me, send me an email at jpryzby@gmail.com.
+                    </p>
                 </div>
                 
                 <div className='aboutProfile'>

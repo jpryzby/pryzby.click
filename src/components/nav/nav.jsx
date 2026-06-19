@@ -29,9 +29,9 @@ export default function Nav() {
                 <h3>About Me</h3>
             </div>
 
-            <div className='navElement' onClick={() => handleNavClick('contactContainer')}>
+            {/* <div className='navElement' onClick={() => handleNavClick('contactContainer')}>
                 <h3>Contact</h3>
-            </div>
+            </div> */}
         </div>
     );
 }

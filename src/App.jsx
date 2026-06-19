@@ -1,24 +1,37 @@
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home/home'
 import Landing from './pages/Home/sections/landing'
 import About from './pages/Home/sections/about'
 import Projects from './pages/Home/sections/projects'
 import Contact from './pages/Home/sections/contact'
+
 import Steganography from './pages/steganography/steganography'
-
-
 import SportsBetNN from './pages/SportsBetNN/sportsBetNN'
 import RunescapeBot from './pages/RSBot/runescapeBot'
 
 
+function ScrollToTop() {
+  const { pathname } = useLocation(); // needs to be imported from react-router-dom
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 
 function App() {
 
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />

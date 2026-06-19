@@ -32,8 +32,8 @@ export default function Home() {
             <Nav />
             <About />
             <Projects />
-            <Contact />
-            <Footer />
+            {/* <Contact /> */}
+            {/* <Footer /> */}
         </div>
     );
 }
